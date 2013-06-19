@@ -1,6 +1,5 @@
 #!/bin/bash
 sudo apt-get update
-sudo apt-get -y install python-virtualenv
 
 deb http://www.rabbitmq.com/debian/ testing main
 

@@ -13,7 +13,7 @@ Vagrant::Config.run do |config|
 
   # Forward a port from the guest to the host, which allows for outside
   # computers to access the VM, whereas host only networking does not.
-  # config.vm.forward_port 8000, 8000
+  config.vm.forward_port 55672, 55672
 
   # Configure a private network required by nfs folder share
   config.vm.network :hostonly, "33.33.33.10"
