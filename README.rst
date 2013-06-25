@@ -3,7 +3,7 @@ About RabbitMQ Alert
 
 Send notifications to the staff when predefined conditions are triggered.
 
-(FYI, this is an early project, the first version will be released within a week)
+(FYI, this is an work in progress)
 
 What conditions?
 ================
