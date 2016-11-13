@@ -1,8 +1,10 @@
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 from optparse import OptionParser
 import urllib2
 import json
 import time
+import smtplib
 
 
 def setup_options():
@@ -20,12 +22,23 @@ def setup_options():
 
     arguments.add_option("--check-rate", dest="check_rate", help="Conditions check frequency, in seconds.", type="int", default=60)
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
+    arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
+    arguments.add_option("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type="string", default="localhost")
 
     return arguments.parse_args()[0]
 
 
 def send_notification(param, current_value):
-    pass
+    options = setup_options()
+
+    msgText = "%s\n\"%s\" > %s" % (options.host, param, str(current_value))
+
+    server = smtplib.SMTP(options.email_server, 25)
+
+    recipients = options.email_to.split(",")
+    server.sendmail(options.email_from, recipients, msgText)
+
+    server.quit()
 
 
 def run_notification_sender():
