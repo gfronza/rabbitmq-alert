@@ -8,7 +8,6 @@ import time
 import os.path
 import smtplib
 
-
 def setup_options():
     arguments = OptionParser()
     arguments.add_option("-c", "--config-file", dest="config_file", help="Path of the configuration file", type="string", default=None)
@@ -27,6 +26,8 @@ def setup_options():
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
     arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
     arguments.add_option("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type="string", default="localhost")
+    arguments.add_option("--slack-url", dest="slack_url", help="Slack hook URL", type="string")
+    arguments.add_option("--slack-payload", dest="slack_payload", help="Slack message payload", type="string")
 
     options = arguments.parse_args()[0]
 
@@ -48,20 +49,30 @@ def setup_options():
         options.email_to = config.get("Email", "to")
         options.email_from = config.get("Email", "from")
         options.email_server = config.get("Email", "host")
+        options.slack_url = config.get("Slack", "url")
+        options.slack_payload = config.get("Slack", "payload")
 
     return options
 
-
 def send_notification(options, param, current_value):
     msgText = "%s - %s:\n\"%s\" > %s" % (options.host, options.queue, param, str(current_value))
+    
+    if options.email_to:
+        server = smtplib.SMTP(options.email_server, 25)
 
-    server = smtplib.SMTP(options.email_server, 25)
+        recipients = options.email_to.split(",")
+        server.sendmail(options.email_from, recipients, msgText)
 
-    recipients = options.email_to.split(",")
-    server.sendmail(options.email_from, recipients, msgText)
+        server.quit()
 
-    server.quit()
+    if options.slack_url and options.slack_payload:
+        # escape double quotes from possibly breaking the slack message payload
+        msgText = msgText.replace("\"", "\\\"")
+        msgTextSlack = options.slack_payload % (msgText)
 
+        request = urllib2.Request(options.slack_url, msgTextSlack)
+        response = urllib2.urlopen(request)
+        response.close()
 
 def run_notification_sender(options):
     url = "http://%s:%s/api/queues/%s/%s" % (options.host, options.port, options.vhost, options.queue)
