@@ -14,7 +14,7 @@ def setup_options():
     arguments.add_option("--username", dest="username", help="RabbitMQ API username", type="string", default="rabbitmq")
     arguments.add_option("--password", dest="password", help="RabbitMQ API password", type="string", default="rabbitmq")
     arguments.add_option("--vhost", dest="vhost", help="Name of the vhost to inspect", type="string", default="celery")
-    arguments.add_option("--queue", dest="queue", help="Name of the queue to inspect", type="string", default="celery")
+    arguments.add_option("--queues", dest="queues", help="List of comma-separated queue names to inspect", type="string", default="celery")
 
     arguments.add_option("--ready-queue-size", dest="ready_queue_size", help="Size of Ready messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--unacknowledged-queue-size", dest="unack_queue_size", help="Size of the Unacknowledged messages on the queue to alert as warning", type="int", default=0)
@@ -28,10 +28,8 @@ def setup_options():
     return arguments.parse_args()[0]
 
 
-def send_notification(param, current_value):
-    options = setup_options()
-
-    msgText = "%s\n\"%s\" > %s" % (options.host, param, str(current_value))
+def send_notification(options, param, current_value):
+    msgText = "%s - %s:\n\"%s\" > %s" % (options.host, options.queue, param, str(current_value))
 
     server = smtplib.SMTP(options.email_server, 25)
 
@@ -41,46 +39,49 @@ def send_notification(param, current_value):
     server.quit()
 
 
-def run_notification_sender():
-    options = setup_options()
-
-    url = "http://%s:%s/api/queues/%s/%s" % (options.host, options.port,
-                                             options.vhost, options.queue)
+def run_notification_sender(options):
+    url = "http://%s:%s/api/queues/%s/%s" % (options.host, options.port, options.vhost, options.queue)
 
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
     password_mgr.add_password(None, url, options.username, options.password)
     handler = urllib2.HTTPBasicAuthHandler(password_mgr)
     opener = urllib2.build_opener(handler)
 
+    try:
+        request = opener.open(url)
+        response = request.read()
+        request.close()
+
+        ready_size = options.ready_queue_size
+        unack_size = options.unack_queue_size
+        total_size = options.total_queue_size
+
+        data = json.loads(response)
+        messages_ready = data.get('messages_ready')
+        messages_unacknowledged = data.get('messages_unacknowledged')
+        messages = data.get('messages')
+
+        if ready_size and messages_ready > ready_size:
+            send_notification(options, 'messages_ready', ready_size)
+
+        if unack_size and messages_unacknowledged > unack_size:
+            send_notification(options, 'messages_unacknowledged', unack_size)
+
+        if total_size and messages > total_size:
+            send_notification(options, 'messages', total_size)
+
+    except urllib2.HTTPError, e:
+        print "Error code %s hitting %s" % (e.code, url)
+        exit(1)
+
+
+if __name__ ==  '__main__':
+    options = setup_options()
+
+    queues_list = options.queues.split(',')
     while True:
-        try:
-            request = opener.open(url)
-            response = request.read()
-            request.close()
+        for queue in queues_list:
+            options.queue = queue
+            run_notification_sender(options)
 
-            ready_size = options.ready_queue_size
-            unack_size = options.unack_queue_size
-            total_size = options.total_queue_size
-
-            data = json.loads(response)
-            messages_ready = data.get('messages_ready')
-            messages_unacknowledged = data.get('messages_unacknowledged')
-            messages = data.get('messages')
-
-            if ready_size and messages_ready > ready_size:
-                send_notification('messages_ready', ready_size)
-
-            if unack_size and messages_unacknowledged > unack_size:
-                send_notification('messages_unacknowledged', unack_size)
-
-            if total_size and messages > total_size:
-                send_notification('messages', total_size)
-
-            time.sleep(options.check_rate)
-        except urllib2.HTTPError, e:
-            print "Error code %s hitting %s" % (e.code, url)
-            exit(1)
-
-
-if __name__ == '__main__':
-    run_notification_sender()
+        time.sleep(options.check_rate)
