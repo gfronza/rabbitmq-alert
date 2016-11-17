@@ -28,7 +28,8 @@ def setup_options():
     arguments.add_option("--email-subject", dest="email_subject", help="The email subject", type="string")
     arguments.add_option("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type="string", default="localhost")
     arguments.add_option("--slack-url", dest="slack_url", help="Slack hook URL", type="string")
-    arguments.add_option("--slack-payload", dest="slack_payload", help="Slack message payload", type="string")
+    arguments.add_option("--slack-channel", dest="slack_channel", help="Slack channel to message to", type="string")
+    arguments.add_option("--slack-username", dest="slack_username", help="Sender's Slack username", type="string")
 
     options = arguments.parse_args()[0]
 
@@ -52,7 +53,8 @@ def setup_options():
         options.email_subject = config.get("Email", "subject")
         options.email_server = config.get("Email", "host")
         options.slack_url = config.get("Slack", "url")
-        options.slack_payload = config.get("Slack", "payload")
+        options.slack_channel = config.get("Slack", "channel")
+        options.slack_username = config.get("Slack", "username")
 
     return options
 
@@ -70,12 +72,12 @@ def send_notification(options, param, current_value):
 
         server.quit()
 
-    if options.slack_url and options.slack_payload:
+    if options.slack_url and options.slack_channel and options.slack_username:
         # escape double quotes from possibly breaking the slack message payload
         text_slack = text.replace("\"", "\\\"")
-        text_slack = options.slack_payload % (text_slack)
+        slack_payload = '{"channel": "#%s", "username": "%s", "text": "%s"}' % (options.slack_channel, options.slack_username, text_slack)
 
-        request = urllib2.Request(options.slack_url, text_slack)
+        request = urllib2.Request(options.slack_url, slack_payload)
         response = urllib2.urlopen(request)
         response.close()
 
@@ -113,7 +115,6 @@ def run_notification_sender(options):
     except urllib2.HTTPError, e:
         print "Error code %s hitting %s" % (e.code, url)
         exit(1)
-
 
 if __name__ ==  '__main__':
     options = setup_options()
