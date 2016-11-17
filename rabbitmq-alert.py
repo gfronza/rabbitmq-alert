@@ -33,7 +33,11 @@ def setup_options():
 
     options = arguments.parse_args()[0]
 
-    if not options.config_file is None and os.path.isfile(options.config_file):
+    if options.config_file:
+        if not os.path.isfile(options.config_file):
+            print "The provided configuration file does not exist."
+            exit(1)
+
         # set as defaults the values or the defaults of OptionParser
         config = ConfigParser(vars(options))
         config.read(options.config_file)
