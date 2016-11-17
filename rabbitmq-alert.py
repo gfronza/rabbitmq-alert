@@ -25,6 +25,7 @@ def setup_options():
 
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
     arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
+    arguments.add_option("--email-subject", dest="email_subject", help="The email subject", type="string")
     arguments.add_option("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type="string", default="localhost")
     arguments.add_option("--slack-url", dest="slack_url", help="Slack hook URL", type="string")
     arguments.add_option("--slack-payload", dest="slack_payload", help="Slack message payload", type="string")
@@ -48,6 +49,7 @@ def setup_options():
         options.total_queue_size = int(config.get("Conditions", "total_queue_size"))
         options.email_to = config.get("Email", "to")
         options.email_from = config.get("Email", "from")
+        options.email_subject = config.get("Email", "subject")
         options.email_server = config.get("Email", "host")
         options.slack_url = config.get("Slack", "url")
         options.slack_payload = config.get("Slack", "payload")
@@ -55,22 +57,25 @@ def setup_options():
     return options
 
 def send_notification(options, param, current_value):
-    msgText = "%s - %s:\n\"%s\" > %s" % (options.host, options.queue, param, str(current_value))
+    text = "%s - %s:\n\"%s\" > %s" % (options.host, options.queue, param, str(current_value))
     
     if options.email_to:
         server = smtplib.SMTP(options.email_server, 25)
 
         recipients = options.email_to.split(",")
-        server.sendmail(options.email_from, recipients, msgText)
+        # add subject as header before message text
+        subject_email = options.email_subject % (options.host, options.queue)
+        text_email = "Subject: %s\n\n%s" % (subject_email, text)
+        server.sendmail(options.email_from, recipients, text_email)
 
         server.quit()
 
     if options.slack_url and options.slack_payload:
         # escape double quotes from possibly breaking the slack message payload
-        msgText = msgText.replace("\"", "\\\"")
-        msgTextSlack = options.slack_payload % (msgText)
+        text_slack = text.replace("\"", "\\\"")
+        text_slack = options.slack_payload % (text_slack)
 
-        request = urllib2.Request(options.slack_url, msgTextSlack)
+        request = urllib2.Request(options.slack_url, text_slack)
         response = urllib2.urlopen(request)
         response.close()
 
