@@ -10,6 +10,7 @@ Which conditions?
 - Unacknowledged messages
 - Total queued messages
 - Number of connected consumers
+- Number of nodes running
 
 My inspiration to create this notification sender is to monitor a set of Celery workers. Sometimes they stop working and monitoring
 the queue size seems to be an easy way to know when these situations happen. Additionally, automatically monitoring the queue sizes

@@ -23,6 +23,7 @@ def setup_options():
     arguments.add_option("--unacknowledged-queue-size", dest="unack_queue_size", help="Size of the Unacknowledged messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--total-queue-size", dest="total_queue_size", help="Size of the Total messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--consumers-connected", dest="consumers_connected", help="The number of consumers that should be connected", type="int", default=0)
+    arguments.add_option("--nodes-running", dest="nodes_running", help="The number of nodes running", type="int", default=0)
 
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
     arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
@@ -54,6 +55,7 @@ def setup_options():
         options.unack_queue_size = int(config.get("Conditions", "unack_queue_size"))
         options.total_queue_size = int(config.get("Conditions", "total_queue_size"))
         options.consumers_connected = int(config.get("Conditions", "consumers_connected"))
+        options.nodes_running = int(config.get("Conditions", "nodes_running"))
         options.email_to = config.get("Email", "to")
         options.email_from = config.get("Email", "from")
         options.email_subject = config.get("Email", "subject")
@@ -108,7 +110,7 @@ def check_queue_conditions(options):
     if total_size and messages > total_size:
         send_notification(options, "%s: messages > %s" % (options.queue, str(total_size)))
 
-def check_server_conditions(options):
+def check_connection_conditions(options):
     url = "http://%s:%s/api/connections" % (options.host, options.port)
     data = send_request(url, options)
 
@@ -118,6 +120,17 @@ def check_server_conditions(options):
 
     if options.consumers_connected and consumers_connected < consumers_con:
         send_notification(options, "consumers_connected < %s" % str(consumers_con))
+
+def check_node_conditions(options):
+    url = "http://%s:%s/api/nodes" % (options.host, options.port)
+    data = send_request(url, options)
+
+    nodes_running = len(data)
+
+    nodes_run = options.nodes_running
+
+    if nodes_run and nodes_running < nodes_run:
+        send_notification(options, "nodes_running < %s" % str(nodes_run))
 
 def send_request(url, options):
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -148,6 +161,9 @@ if __name__ ==  "__main__":
                 check_queue_conditions(options)
 
         if options.consumers_connected:
-            check_server_conditions(options)
+            check_connection_conditions(options)
+
+        if options.nodes_running:
+            check_node_conditions(options)
 
         time.sleep(options.check_rate)
