@@ -22,6 +22,7 @@ def setup_options():
     arguments.add_option("--ready-queue-size", dest="ready_queue_size", help="Size of Ready messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--unacknowledged-queue-size", dest="unack_queue_size", help="Size of the Unacknowledged messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--total-queue-size", dest="total_queue_size", help="Size of the Total messages on the queue to alert as warning", type="int", default=0)
+    arguments.add_option("--consumers-connected", dest="consumers_connected", help="The number of consumers that should be connected", type="int", default=0)
 
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
     arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
@@ -52,6 +53,7 @@ def setup_options():
         options.ready_queue_size = int(config.get("Conditions", "ready_queue_size"))
         options.unack_queue_size = int(config.get("Conditions", "unack_queue_size"))
         options.total_queue_size = int(config.get("Conditions", "total_queue_size"))
+        options.consumers_connected = int(config.get("Conditions", "consumers_connected"))
         options.email_to = config.get("Email", "to")
         options.email_from = config.get("Email", "from")
         options.email_subject = config.get("Email", "subject")
@@ -62,9 +64,9 @@ def setup_options():
 
     return options
 
-def send_notification(options, param, current_value):
-    text = "%s - %s:\n\"%s\" > %s" % (options.host, options.queue, param, str(current_value))
-    
+def send_notification(options, body):
+    text = "%s - %s" % (options.host, body)
+
     if options.email_to:
         server = smtplib.SMTP(options.email_server, 25)
 
@@ -85,9 +87,39 @@ def send_notification(options, param, current_value):
         response = urllib2.urlopen(request)
         response.close()
 
-def run_notification_sender(options):
+def check_queue_conditions(options):
     url = "http://%s:%s/api/queues/%s/%s" % (options.host, options.port, options.vhost, options.queue)
+    data = send_request(url, options)
 
+    messages_ready = data.get("messages_ready")
+    messages_unacknowledged = data.get("messages_unacknowledged")
+    messages = data.get("messages")
+
+    ready_size = options.ready_queue_size
+    unack_size = options.unack_queue_size
+    total_size = options.total_queue_size
+
+    if ready_size and messages_ready > ready_size:
+        send_notification(options, "%s: messages_ready > %s" % (options.queue, str(ready_size)))
+
+    if unack_size and messages_unacknowledged > unack_size:
+        send_notification(options, "%s: messages_unacknowledged > %s" % (options.queue, str(unack_size)))
+
+    if total_size and messages > total_size:
+        send_notification(options, "%s: messages > %s" % (options.queue, str(total_size)))
+
+def check_server_conditions(options):
+    url = "http://%s:%s/api/connections" % (options.host, options.port)
+    data = send_request(url, options)
+
+    consumers_connected = len(data)
+
+    consumers_con = options.consumers_connected
+
+    if options.consumers_connected and consumers_connected < consumers_con:
+        send_notification(options, "consumers_connected < %s" % str(consumers_con))
+
+def send_request(url, options):
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
     password_mgr.add_password(None, url, options.username, options.password)
     handler = urllib2.HTTPBasicAuthHandler(password_mgr)
@@ -98,35 +130,24 @@ def run_notification_sender(options):
         response = request.read()
         request.close()
 
-        ready_size = options.ready_queue_size
-        unack_size = options.unack_queue_size
-        total_size = options.total_queue_size
-
         data = json.loads(response)
-        messages_ready = data.get('messages_ready')
-        messages_unacknowledged = data.get('messages_unacknowledged')
-        messages = data.get('messages')
-
-        if ready_size and messages_ready > ready_size:
-            send_notification(options, 'messages_ready', ready_size)
-
-        if unack_size and messages_unacknowledged > unack_size:
-            send_notification(options, 'messages_unacknowledged', unack_size)
-
-        if total_size and messages > total_size:
-            send_notification(options, 'messages', total_size)
+        return data
 
     except urllib2.HTTPError, e:
         print "Error code %s hitting %s" % (e.code, url)
         exit(1)
 
-if __name__ ==  '__main__':
+if __name__ ==  "__main__":
     options = setup_options()
 
-    queues_list = options.queues.split(',')
+    queues_list = options.queues.split(",")
     while True:
-        for queue in queues_list:
-            options.queue = queue
-            run_notification_sender(options)
+        if options.ready_queue_size or options.unack_queue_size or options.total_queue_size:
+            for queue in queues_list:
+                options.queue = queue
+                check_queue_conditions(options)
+
+        if options.consumers_connected:
+            check_server_conditions(options)
 
         time.sleep(options.check_rate)
