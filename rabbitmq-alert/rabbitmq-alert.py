@@ -24,6 +24,7 @@ def setup_options():
     arguments.add_option("--total-queue-size", dest="total_queue_size", help="Size of the Total messages on the queue to alert as warning", type="int", default=0)
     arguments.add_option("--consumers-connected", dest="consumers_connected", help="The number of consumers that should be connected", type="int", default=0)
     arguments.add_option("--nodes-running", dest="nodes_running", help="The number of nodes running", type="int", default=0)
+    arguments.add_option("--node-memory-used", dest="node_memory_used", help="Memory used by each node in MBs", type="int", default=0)
 
     arguments.add_option("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type="string")
     arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
@@ -56,6 +57,7 @@ def setup_options():
         options.total_queue_size = int(config.get("Conditions", "total_queue_size"))
         options.consumers_connected = int(config.get("Conditions", "consumers_connected"))
         options.nodes_running = int(config.get("Conditions", "nodes_running"))
+        options.node_memory_used = int(config.get("Conditions", "node_memory_used"))
         options.email_to = config.get("Email", "to")
         options.email_from = config.get("Email", "from")
         options.email_subject = config.get("Email", "subject")
@@ -128,9 +130,14 @@ def check_node_conditions(options):
     nodes_running = len(data)
 
     nodes_run = options.nodes_running
+    node_memory = options.node_memory_used
 
     if nodes_run and nodes_running < nodes_run:
         send_notification(options, "nodes_running < %s" % str(nodes_run))
+
+    for node in data:
+        if node_memory and node.get("mem_used") > (node_memory * 1000000):
+            send_notification(options, "Node %s - node_memory_used > %s MBs" % (node.get("name"), str(node_memory)))
 
 def send_request(url, options):
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
