@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name = "rabbitmq-alert",
-    packages = ["rabbitmq-alert"],
+    packages = ["rabbitmqalert"],
     version = "1.0",
     description = "Send notifications when predefined conditions are met",
     author = "Germano Fronza, Kostas Milonas",
