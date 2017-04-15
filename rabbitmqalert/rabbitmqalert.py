@@ -1,15 +1,16 @@
 #! /usr/bin/python2
 # -*- coding: utf-8 -*-
-from optparse import OptionParser
-from ConfigParser import ConfigParser
+import optparse
+import ConfigParser
 import urllib2
 import json
 import time
 import os.path
 import smtplib
+import sys
 
 def setup_options():
-    arguments = OptionParser()
+    arguments = optparse.OptionParser()
     arguments.add_option("-c", "--config-file", dest="config_file", help="Path of the configuration file", type="string", default=None)
     arguments.add_option("--host", dest="host", help="RabbitMQ API address", type="string", default="localhost")
     arguments.add_option("--port", dest="port", help="RabbitMQ API port", type="string", default="55672")
@@ -42,7 +43,7 @@ def setup_options():
             exit(1)
 
         # set as defaults the values or the defaults of OptionParser
-        config = ConfigParser(vars(options))
+        config = ConfigParser.ConfigParser(vars(options))
         config.read(options.config_file)
 
         options.host = config.get("Server", "host")
