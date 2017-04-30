@@ -3,3 +3,4 @@ deps-dev:
 
 test:
 	rabbitmqalert/test_rabbitmqalert.py -b
+	rabbitmqalert/test_optionsresolver.py -b
