@@ -8,6 +8,7 @@ import time
 import os.path
 import smtplib
 
+
 class RabbitMQAlert:
     def setup_options(self):
         arguments = optparse.OptionParser()
@@ -46,26 +47,26 @@ class RabbitMQAlert:
             config = ConfigParser.ConfigParser(vars(options))
             config.read(options.config_file)
 
-            options.host = config.get("Server", "host")
-            options.port = config.get("Server", "port")
-            options.username = config.get("Server", "username")
-            options.password = config.get("Server", "password")
-            options.vhost = config.get("Server", "vhost")
-            options.queues = config.get("Server", "queues")
-            options.check_rate = config.getfloat("Server", "check_rate")
-            options.ready_queue_size = config.getint("Conditions", "ready_queue_size")
-            options.unack_queue_size = config.getint("Conditions", "unack_queue_size")
-            options.total_queue_size = config.getint("Conditions", "total_queue_size")
-            options.consumers_connected = config.getint("Conditions", "consumers_connected")
-            options.nodes_running = config.getint("Conditions", "nodes_running")
-            options.node_memory_used = config.getint("Conditions", "node_memory_used")
-            options.email_to = config.get("Email", "to")
-            options.email_from = config.get("Email", "from")
-            options.email_subject = config.get("Email", "subject")
-            options.email_server = config.get("Email", "host")
-            options.slack_url = config.get("Slack", "url")
-            options.slack_channel = config.get("Slack", "channel")
-            options.slack_username = config.get("Slack", "username")
+            options.host = options.host or config.get("Server", "host")
+            options.port = options.port or config.get("Server", "port")
+            options.username = options.username or config.get("Server", "username")
+            options.password = options.password or config.get("Server", "password")
+            options.vhost = options.vhost or config.get("Server", "vhost")
+            options.queues = options.queues or config.get("Server", "queues")
+            options.check_rate = options.check_rate or config.getfloat("Server", "check_rate")
+            options.ready_queue_size = options.ready_queue_size or config.getint("Conditions", "ready_queue_size")
+            options.unack_queue_size = options.unack_queue_size or config.getint("Conditions", "unack_queue_size")
+            options.total_queue_size = options.total_queue_size or config.getint("Conditions", "total_queue_size")
+            options.consumers_connected = options.consumers_connected or config.getint("Conditions", "consumers_connected")
+            options.nodes_running = options.nodes_running or config.getint("Conditions", "nodes_running")
+            options.node_memory_used = options.node_memory_used or config.getint("Conditions", "node_memory_used")
+            options.email_to = options.email_to or config.get("Email", "to")
+            options.email_from = options.email_from or config.get("Email", "from")
+            options.email_subject = options.email_subject or config.get("Email", "subject")
+            options.email_server = options.email_server or config.get("Email", "host")
+            options.slack_url = options.slack_url or config.get("Slack", "url")
+            options.slack_channel = options.slack_channel or config.get("Slack", "channel")
+            options.slack_username = options.slack_username or config.get("Slack", "username")
 
         return options
 

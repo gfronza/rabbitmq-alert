@@ -300,36 +300,7 @@ class rabbitMqAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert()
         options = ["--config", "foo.ini"]
 
-        config_file_options = {
-            "Server": {
-                "host": "foo-host",
-                "port": "foo-port",
-                "username": "foo-username",
-                "password": "foo-password",
-                "vhost": "foo-vhost",
-                "queues": "foo-queues",
-                "check_rate": "10"
-            },
-            "Conditions": {
-                "ready_queue_size": "20",
-                "unack_queue_size": "30",
-                "total_queue_size": "40",
-                "consumers_connected": "50",
-                "nodes_running": "60",
-                "node_memory_used": "70"
-            },
-            "Email": {
-                "to": "foo-email-to",
-                "from": "foo-email-from",
-                "subject": "foo-email-subject",
-                "host": "foo-email-host"
-            },
-            "Slack": {
-                "url": "foo-slack-url",
-                "channel": "foo-slack-channel",
-                "username": "foo-slack-username"
-            }
-        }
+        config_file_options = self.construct_config_file_options()
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
@@ -358,6 +329,21 @@ class rabbitMqAlertTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-url", options_result.slack_url)
         self.assertEquals("foo-slack-channel", options_result.slack_channel)
         self.assertEquals("foo-slack-username", options_result.slack_username)
+
+    def test_setup_options_overrides_config_file_option_when_option_given_from_cli(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        options = ["--config", "foo.ini", "--email-to", "foo-email-to-new"]
+
+        config_file_options = self.construct_config_file_options()
+        parser = ConfigParser.ConfigParser()
+        parser._sections = config_file_options
+
+        rabbitmqalert.os.path.isfile = mock.MagicMock(return_value=True)
+        rabbitmqalert.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
+        rabbitmqalert.optparse.sys.argv[1:] = options
+        options_result = rmqa.setup_options()
+
+        self.assertEquals("foo-email-to-new", options_result.email_to)
 
     def construct_options_complete(self):
         options = self.MockOptions(
@@ -428,24 +414,60 @@ class rabbitMqAlertTestCase(unittest.TestCase):
 
         return options
 
-    def construct_response_queue(self):
+    @staticmethod
+    def construct_response_queue():
         return {
             "messages_ready": 0,
             "messages_unacknowledged": 0,
             "messages": 0
         }
 
-    def construct_response_connection(self):
+    @staticmethod
+    def construct_response_connection():
         return {
             "consumer_foo": {},
             "consumer_bar": {}
         }
 
-    def construct_response_node(self):
+    @staticmethod
+    def construct_response_node():
         return [
             { "mem_used": 500000 },
             { "mem_used": 500000 }
         ]
+
+    @staticmethod
+    def construct_config_file_options():
+        return {
+            "Server": {
+                "host": "foo-host",
+                "port": "foo-port",
+                "username": "foo-username",
+                "password": "foo-password",
+                "vhost": "foo-vhost",
+                "queues": "foo-queues",
+                "check_rate": "10"
+            },
+            "Conditions": {
+                "ready_queue_size": "20",
+                "unack_queue_size": "30",
+                "total_queue_size": "40",
+                "consumers_connected": "50",
+                "nodes_running": "60",
+                "node_memory_used": "70"
+            },
+            "Email": {
+                "to": "foo-email-to",
+                "from": "foo-email-from",
+                "subject": "foo-email-subject",
+                "host": "foo-email-host"
+            },
+            "Slack": {
+                "url": "foo-slack-url",
+                "channel": "foo-slack-channel",
+                "username": "foo-slack-username"
+            }
+        }
 
 if __name__ == "__main__":
     unittest.main()
