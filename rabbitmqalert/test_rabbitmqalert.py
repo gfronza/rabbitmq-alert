@@ -235,34 +235,6 @@ class rabbitMqAlertTestCase(unittest.TestCase):
 
         rabbitmqalert.urllib2.urlopen.assert_not_called()
 
-    def test_setup_options_returns_default_options_when_no_options_given(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
-        options = []
-
-        rabbitmqalert.optparse.sys.argv[1:] = options
-        options_result = rmqa.setup_options()
-
-        self.assertEquals("localhost", options_result.host)
-        self.assertEquals("55672", options_result.port)
-        self.assertEquals("rabbitmq", options_result.username)
-        self.assertEquals("rabbitmq", options_result.password)
-        self.assertEquals("celery", options_result.vhost)
-        self.assertEquals("celery", options_result.queues)
-        self.assertEquals(60, options_result.check_rate)
-        self.assertEquals(0, options_result.ready_queue_size)
-        self.assertEquals(0, options_result.unack_queue_size)
-        self.assertEquals(0, options_result.total_queue_size)
-        self.assertEquals(0, options_result.consumers_connected)
-        self.assertEquals(0, options_result.nodes_running)
-        self.assertEquals(0, options_result.node_memory_used)
-        self.assertEquals(None, options_result.email_to)
-        self.assertEquals(None, options_result.email_from)
-        self.assertEquals(None, options_result.email_subject)
-        self.assertEquals("localhost", options_result.email_server)
-        self.assertEquals(None, options_result.slack_url)
-        self.assertEquals(None, options_result.slack_channel)
-        self.assertEquals(None, options_result.slack_username)
-
     def test_setup_options_returns_non_default_options_when_options_given_and_no_config_file(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
         options = [
