@@ -34,36 +34,74 @@ class OptionsResover:
         arguments.add_option("--slack-channel", dest="slack_channel", help="Slack channel to message to", type="string")
         arguments.add_option("--slack-username", dest="slack_username", help="Sender's Slack username", type="string")
 
-        options = arguments.parse_args()[0]
+        cli_arguments = arguments.parse_args()[0]
 
-        if options.config_file:
-            if not os.path.isfile(options.config_file):
+        # set as defaults the cli argument values
+        config_file_options = ConfigParser.ConfigParser(vars(cli_arguments))
+
+        options = dict()
+        if cli_arguments.config_file:
+            if not os.path.isfile(cli_arguments.config_file):
                 print "The provided configuration file does not exist."
                 exit(1)
 
-            # set as defaults the values or the defaults of OptionParser
-            config = ConfigParser.ConfigParser(vars(options))
-            config.read(options.config_file)
+            config_file_options.read(cli_arguments.config_file)
 
-            options.host = options.host or config.get("Server", "host")
-            options.port = options.port or config.get("Server", "port")
-            options.username = options.username or config.get("Server", "username")
-            options.password = options.password or config.get("Server", "password")
-            options.vhost = options.vhost or config.get("Server", "vhost")
-            options.queues = options.queues or config.get("Server", "queues")
-            options.check_rate = options.check_rate or config.getfloat("Server", "check_rate")
-            options.ready_queue_size = options.ready_queue_size or config.getint("Conditions", "ready_queue_size")
-            options.unack_queue_size = options.unack_queue_size or config.getint("Conditions", "unack_queue_size")
-            options.total_queue_size = options.total_queue_size or config.getint("Conditions", "total_queue_size")
-            options.consumers_connected = options.consumers_connected or config.getint("Conditions", "consumers_connected")
-            options.nodes_running = options.nodes_running or config.getint("Conditions", "nodes_running")
-            options.node_memory_used = options.node_memory_used or config.getint("Conditions", "node_memory_used")
-            options.email_to = options.email_to or config.get("Email", "to")
-            options.email_from = options.email_from or config.get("Email", "from")
-            options.email_subject = options.email_subject or config.get("Email", "subject")
-            options.email_server = options.email_server or config.get("Email", "host")
-            options.slack_url = options.slack_url or config.get("Slack", "url")
-            options.slack_channel = options.slack_channel or config.get("Slack", "channel")
-            options.slack_username = options.slack_username or config.get("Slack", "username")
+        options["host"] = cli_arguments.host or config_file_options.get("Server", "host")
+        options["port"] = cli_arguments.port or config_file_options.get("Server", "port")
+        options["username"] = cli_arguments.username or config_file_options.get("Server", "username")
+        options["password"] = cli_arguments.password or config_file_options.get("Server", "password")
+        options["vhost"] = cli_arguments.vhost or config_file_options.get("Server", "vhost")
+        options["check_rate"] = cli_arguments.check_rate or config_file_options.getfloat("Server", "check_rate")
+        options["queues"] = cli_arguments.queues or config_file_options.get("Server", "queues")
+        options["queues"] = options["queues"].split(",")
+
+        options["email_to"] = cli_arguments.email_to or config_file_options.get("Email", "to")
+        options["email_to"] = options["email_to"].split(",")
+        options["email_from"] = cli_arguments.email_from or config_file_options.get("Email", "from")
+        options["email_subject"] = cli_arguments.email_subject or config_file_options.get("Email", "subject")
+        options["email_server"] = cli_arguments.email_server or config_file_options.get("Email", "host")
+        options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
+        options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
+        options["slack_username"] = cli_arguments.slack_username or config_file_options.get("Slack", "username")
+
+        # get queue specific condition values if any, else construct from the generic one
+        conditions = OptionsResover.construct_conditions(options, cli_arguments, config_file_options)
+        options = dict(options.items() + conditions.items())
 
         return options
+
+    @staticmethod
+    def construct_conditions(options, cli_arguments, config_file_options):
+        conditions = dict()
+
+        # get the generic condition values from the "[Conditions]" section
+        default_conditions = dict()
+        try:
+            default_conditions["ready_queue_size"] = cli_arguments.ready_queue_size or config_file_options.getint("Conditions", "ready_queue_size")
+            default_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint("Conditions", "unack_queue_size")
+            default_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint("Conditions", "total_queue_size")
+            default_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint("Conditions", "consumers_connected")
+            default_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint("Conditions", "nodes_running")
+            default_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint("Conditions", "node_memory_used")
+        except:
+            pass
+
+        # check if queue specific condition sections exist, if not use the generic conditions
+        if "queues" in options:
+            for queue in options["queues"]:
+                queue_conditions_section_name = "Conditions:" + queue
+
+                try:
+                    queue_conditions = dict()
+                    queue_conditions["ready_queue_size"] = cli_arguments.ready_queue_size or config_file_options.getint(queue_conditions_section_name, "ready_queue_size")
+                    queue_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint(queue_conditions_section_name, "unack_queue_size")
+                    queue_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint(queue_conditions_section_name, "total_queue_size")
+                    queue_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint(queue_conditions_section_name, "consumers_connected")
+                    queue_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint(queue_conditions_section_name, "nodes_running")
+                    queue_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint(queue_conditions_section_name, "node_memory_used")
+                    conditions[queue] = queue_conditions
+                except:
+                    conditions[queue] = default_conditions
+
+        return {"conditions": conditions}
