@@ -64,3 +64,23 @@ Then execute ```rabbitmq-alert``` with the configuration file option:
 ```
 ./rabbitmq-alert.py -c my_config.ini
 ```
+
+You can also define queue specific conditions in the configuration file, in case you want to have fine-tuned options for each queue.
+Just create a "[Conditions]" section for each queue. Example:
+
+```
+[Conditions:my-queue]
+...
+
+[Conditions:my-other-queue]
+...
+```
+
+Note that queue names also have to be defined in the "[Server]" section of the configuration file:
+
+```
+[Server]
+...
+queues=my-queue,my-other-queue
+...
+```
