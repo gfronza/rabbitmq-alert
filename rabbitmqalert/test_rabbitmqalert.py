@@ -198,9 +198,9 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             "queues": ["foo"],
             "conditions": {
                 "foo": {
-                    "ready_queue_size": 1,
-                    "unack_queue_size": 1,
-                    "total_queue_size": 1,
+                    "ready_queue_size": 0,
+                    "unack_queue_size": 0,
+                    "total_queue_size": 0,
                     "consumers_connected": 1,
                     "nodes_running": 1,
                     "node_memory_used": 1

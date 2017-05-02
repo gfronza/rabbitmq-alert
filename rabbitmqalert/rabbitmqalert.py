@@ -9,6 +9,77 @@ import optionsresolver
 
 
 class RabbitMQAlert:
+    def check_queue_conditions(self, options):
+        queue = options["queue"]
+        url = "http://%s:%s/api/queues/%s/%s" % (options["host"], options["port"], options["vhost"], options["queue"])
+        data = self.send_request(url, options)
+
+        messages_ready = data.get("messages_ready")
+        messages_unacknowledged = data.get("messages_unacknowledged")
+        messages = data.get("messages")
+
+        queue_conditions = options["conditions"][queue]
+        ready_size = queue_conditions.get("ready_queue_size")
+        unack_size = queue_conditions.get("unack_queue_size")
+        total_size = queue_conditions.get("total_queue_size")
+
+        if ready_size is not None and messages_ready > ready_size:
+            self.send_notification(options, "%s: messages_ready > %s" % (queue, str(ready_size)))
+
+        if unack_size is not None and messages_unacknowledged > unack_size:
+            self.send_notification(options, "%s: messages_unacknowledged > %s" % (queue, str(unack_size)))
+
+        if total_size is not None and messages > total_size:
+            self.send_notification(options, "%s: messages > %s" % (queue, str(total_size)))
+
+    def check_connection_conditions(self, options):
+        queue = options["queue"]
+        url = "http://%s:%s/api/connections" % (options["host"], options["port"])
+        data = self.send_request(url, options)
+
+        consumers_connected = len(data)
+
+        consumers_con = options["conditions"][queue].get("consumers_connected")
+
+        if consumers_con is not None and consumers_connected < consumers_con:
+            self.send_notification(options, "consumers_connected < %s" % str(consumers_con))
+
+    def check_node_conditions(self, options):
+        queue = options["queue"]
+        url = "http://%s:%s/api/nodes" % (options["host"], options["port"])
+        data = self.send_request(url, options)
+
+        nodes_running = len(data)
+
+        queue_conditions = options["conditions"][queue]
+        nodes_run = queue_conditions.get("nodes_running")
+        node_memory = queue_conditions.get("node_memory_used")
+
+        if nodes_run is not None and nodes_running < nodes_run:
+            self.send_notification(options, "nodes_running < %s" % str(nodes_run))
+
+        for node in data:
+            if node_memory is not None and node.get("mem_used") > (node_memory * 1000000):
+                self.send_notification(options, "Node %s - node_memory_used > %s MBs" % (node.get("name"), str(node_memory)))
+
+    def send_request(self, url, options):
+        password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        password_mgr.add_password(None, url, options["username"], options["password"])
+        handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+        opener = urllib2.build_opener(handler)
+
+        try:
+            request = opener.open(url)
+            response = request.read()
+            request.close()
+
+            data = json.loads(response)
+            return data
+
+        except urllib2.HTTPError, e:
+            print "Error code %s hitting %s" % (e.code, url)
+            exit(1)
+
     def send_notification(self, options, body):
         text = "%s - %s" % (options["host"], body)
 
@@ -32,75 +103,6 @@ class RabbitMQAlert:
             response = urllib2.urlopen(request)
             response.close()
 
-    def check_queue_conditions(self, options):
-        queue = options["queue"]
-        url = "http://%s:%s/api/queues/%s/%s" % (options["host"], options["port"], options["vhost"], options["queue"])
-        data = self.send_request(url, options)
-
-        messages_ready = data.get("messages_ready")
-        messages_unacknowledged = data.get("messages_unacknowledged")
-        messages = data.get("messages")
-
-        ready_size = options["conditions"][queue]["ready_queue_size"]
-        unack_size = options["conditions"][queue]["unack_queue_size"]
-        total_size = options["conditions"][queue]["total_queue_size"]
-
-        if ready_size and messages_ready > ready_size:
-            self.send_notification(options, "%s: messages_ready > %s" % (queue, str(ready_size)))
-
-        if unack_size and messages_unacknowledged > unack_size:
-            self.send_notification(options, "%s: messages_unacknowledged > %s" % (queue, str(unack_size)))
-
-        if total_size and messages > total_size:
-            self.send_notification(options, "%s: messages > %s" % (queue, str(total_size)))
-
-    def check_connection_conditions(self, options):
-        queue = options["queue"]
-        url = "http://%s:%s/api/connections" % (options["host"], options["port"])
-        data = self.send_request(url, options)
-
-        consumers_connected = len(data)
-
-        consumers_con = options["conditions"][queue]["consumers_connected"]
-
-        if consumers_con and consumers_connected < consumers_con:
-            self.send_notification(options, "consumers_connected < %s" % str(consumers_con))
-
-    def check_node_conditions(self, options):
-        queue = options["queue"]
-        url = "http://%s:%s/api/nodes" % (options["host"], options["port"])
-        data = self.send_request(url, options)
-
-        nodes_running = len(data)
-
-        nodes_run = options["conditions"][queue]["nodes_running"]
-        node_memory = options["conditions"][queue]["node_memory_used"]
-
-        if nodes_run and nodes_running < nodes_run:
-            self.send_notification(options, "nodes_running < %s" % str(nodes_run))
-
-        for node in data:
-            if node_memory and node.get("mem_used") > (node_memory * 1000000):
-                self.send_notification(options, "Node %s - node_memory_used > %s MBs" % (node.get("name"), str(node_memory)))
-
-    def send_request(self, url, options):
-        password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        password_mgr.add_password(None, url, options["username"], options["password"])
-        handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-        opener = urllib2.build_opener(handler)
-
-        try:
-            request = opener.open(url)
-            response = request.read()
-            request.close()
-
-            data = json.loads(response)
-            return data
-
-        except urllib2.HTTPError, e:
-            print "Error code %s hitting %s" % (e.code, url)
-            exit(1)
-
 if __name__ ==  "__main__":
     rabbitmqalert = RabbitMQAlert()
     options = optionsresolver.OptionsResover.setup_options()
@@ -108,16 +110,17 @@ if __name__ ==  "__main__":
     while True:
         for queue in options["queues"]:
             options["queue"] = queue
+            queue_conditions = options["conditions"][queue]
 
-            if options["conditions"][queue]["ready_queue_size"]\
-                    or options["conditions"][queue]["unack_queue_size"]\
-                    or options["conditions"][queue]["total_queue_size"]:
+            if "ready_queue_size" in queue_conditions\
+                    or "unack_queue_size" in queue_conditions\
+                    or "total_queue_size" in queue_conditions:
                 rabbitmqalert.check_queue_conditions(options)
 
-            if options["conditions"][queue]["consumers_connected"]:
+            if "consumers_connected" in queue_conditions:
                 rabbitmqalert.check_connection_conditions(options)
 
-            if options["conditions"][queue]["nodes_running"]:
+            if "nodes_running" in queue_conditions:
                 rabbitmqalert.check_node_conditions(options)
 
         time.sleep(options["check_rate"])
