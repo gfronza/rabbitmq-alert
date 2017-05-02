@@ -66,7 +66,7 @@ Then execute ```rabbitmq-alert``` with the configuration file option:
 ```
 
 You can also define queue specific conditions in the configuration file, in case you want to have fine-tuned options for each queue.
-Just create a "[Conditions]" section for each queue. Example:
+Just create a ```[Conditions]``` section for each queue. Example:
 
 ```
 [Conditions:my-queue]
@@ -76,7 +76,7 @@ Just create a "[Conditions]" section for each queue. Example:
 ...
 ```
 
-Note that queue names also have to be defined in the "[Server]" section of the configuration file:
+Note that queue names also have to be defined in the ```[Server]``` section of the configuration file:
 
 ```
 [Server]
@@ -84,3 +84,32 @@ Note that queue names also have to be defined in the "[Server]" section of the c
 queues=my-queue,my-other-queue
 ...
 ```
+
+Contribute
+==========
+
+The project ```rabbitmq-alert``` is written in ```python2```.
+Of course, you can contribute to the project. Take a look at the GitHub "Issues" page and pick an issue to implement / fix.
+Fork the project, develop and then create a pull request, in order for your code to be added to the project.
+
+Prepare your environment
+------------------------
+
+To start, you have to install the dev dependencies which are some required python packages:
+
+```
+make deps-dev
+```
+
+Run the tests!
+--------------
+
+After writing your awesomeness, run the test suites to ensure that everything is still fine:
+
+```
+make test
+```
+
+Do add tests yourself for the code you contribute to ensure the quality of the project.
+
+Happy coding :-)
