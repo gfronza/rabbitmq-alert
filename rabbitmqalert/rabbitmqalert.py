@@ -86,6 +86,12 @@ class RabbitMQAlert:
         if "email_to" in options and options["email_to"]:
             server = smtplib.SMTP(options["email_server"], 25)
 
+            if "email_ssl" in options and options["email_ssl"]:
+                server = smtplib.SMTP_SSL(options["email_server"], 465)
+
+            if "email_password" in options and options["email_password"]:
+                server.login(options["email_from"], options["email_password"])
+
             recipients = options["email_to"]
             # add subject as header before message text
             subject_email = options["email_subject"] % (options["host"], options["queue"])
