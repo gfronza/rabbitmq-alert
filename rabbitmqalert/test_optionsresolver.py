@@ -36,9 +36,13 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--email-from", "foo-email-from",
             "--email-subject", "foo-email-subject",
             "--email-server", "foo-email-server",
+            "--email-password", "foo-email-password",
+            "--email-ssl", "",
             "--slack-url", "foo-slack-url",
             "--slack-channel", "foo-slack-channel",
-            "--slack-username", "foo-slack-username"
+            "--slack-username", "foo-slack-username",
+            "--telegram-token", "foo-telegram-token",
+            "--telegram-channel", "foo-telegram-channel"
         ]
 
         optionsresolver.optparse.sys.argv[1:] = options
@@ -61,9 +65,13 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
         self.assertEquals("foo-email-server", options_result["email_server"])
+        self.assertEquals("foo-email-password", options_result["email_password"])
+        self.assertEquals(True, options_result["email_ssl"])
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
         resolver = optionsresolver.OptionsResover()
@@ -106,9 +114,15 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
         self.assertEquals("foo-email-host", options_result["email_server"])
+        self.assertEquals("foo-email-password", options_result["email_password"])
+        self.assertEquals(True, options_result["email_ssl"])
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_overrides_config_file_option_when_option_given_from_cli(self):
         options = ["--config", "foo.ini", "--email-to", "foo-email-to-new"]
@@ -153,9 +167,13 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
         self.assertEquals("foo-email-host", options_result["email_server"])
+        self.assertEquals("foo-email-password", options_result["email_password"])
+        self.assertEquals(True, options_result["email_ssl"])
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_returns_options_when_config_file_found_with_multiple_queue_specific_conditions(self):
         options = ["--config", "foo.ini"]
@@ -192,9 +210,13 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
         self.assertEquals("foo-email-host", options_result["email_server"])
+        self.assertEquals("foo-email-password", options_result["email_password"])
+        self.assertEquals(True, options_result["email_ssl"])
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
+        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     @staticmethod
     def construct_config_file_options_with_generic_conditions():
@@ -222,7 +244,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "subject": "foo-email-subject",
                 "host": "foo-email-host",
                 "password": "foo-email-password",
-                "ssl": "False"
+                "ssl": "True"
             },
             "Slack": {
                 "url": "foo-slack-url",
@@ -261,7 +283,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "subject": "foo-email-subject",
                 "host": "foo-email-host",
                 "password": "foo-email-password",
-                "ssl": "False"
+                "ssl": "True"
             },
             "Slack": {
                 "url": "foo-slack-url",
@@ -308,7 +330,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "subject": "foo-email-subject",
                 "host": "foo-email-host",
                 "password": "foo-email-password",
-                "ssl": "False"
+                "ssl": "True"
             },
             "Slack": {
                 "url": "foo-slack-url",

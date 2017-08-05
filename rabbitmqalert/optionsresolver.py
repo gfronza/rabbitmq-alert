@@ -65,7 +65,7 @@ class OptionsResover:
         options["email_from"] = cli_arguments.email_from or config_file_options.get("Email", "from")
         options["email_subject"] = cli_arguments.email_subject or config_file_options.get("Email", "subject")
         options["email_server"] = cli_arguments.email_server or config_file_options.get("Email", "host")
-        options["email_password"] = cli_arguments.email_server or config_file_options.get("Email", "password")
+        options["email_password"] = cli_arguments.email_password or config_file_options.get("Email", "password")
         options["email_ssl"] = cli_arguments.email_ssl or config_file_options.getboolean("Email", "ssl")
         options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
         options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
