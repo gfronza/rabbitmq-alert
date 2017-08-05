@@ -220,7 +220,9 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "to": "foo-email-to",
                 "from": "foo-email-from",
                 "subject": "foo-email-subject",
-                "host": "foo-email-host"
+                "host": "foo-email-host",
+                "password": "foo-email-password",
+                "ssl": "False"
             },
             "Slack": {
                 "url": "foo-slack-url",
@@ -253,7 +255,9 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "to": "foo-email-to",
                 "from": "foo-email-from",
                 "subject": "foo-email-subject",
-                "host": "foo-email-host"
+                "host": "foo-email-host",
+                "password": "foo-email-password",
+                "ssl": "False"
             },
             "Slack": {
                 "url": "foo-slack-url",
@@ -294,7 +298,9 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "to": "foo-email-to",
                 "from": "foo-email-from",
                 "subject": "foo-email-subject",
-                "host": "foo-email-host"
+                "host": "foo-email-host",
+                "password": "foo-email-password",
+                "ssl": "False"
             },
             "Slack": {
                 "url": "foo-slack-url",

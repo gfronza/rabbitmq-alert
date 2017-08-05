@@ -148,8 +148,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
-        rmqa.send_notification(options, "")
         rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once()
 
@@ -160,8 +160,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
-        rmqa.send_notification(options, "")
         rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_not_called()
 
