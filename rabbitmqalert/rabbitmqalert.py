@@ -109,6 +109,14 @@ class RabbitMQAlert:
             response = urllib2.urlopen(request)
             response.close()
 
+        if "telegram_token" in options and options["telegram_token"] and "telegram_channel" in options and options["telegram_channel"]:
+            text_telegram = "%s: %s" % (options["queue"], text)
+            telegram_url = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s" % (options["telegram_token"], options["telegram_channel"], text_telegram)
+
+            request = urllib2.Request(telegram_url)
+            response = urllib2.urlopen(request)
+            response.close()
+
 if __name__ ==  "__main__":
     rabbitmqalert = RabbitMQAlert()
     options = optionsresolver.OptionsResover.setup_options()

@@ -35,6 +35,8 @@ class OptionsResover:
         arguments.add_option("--slack-url", dest="slack_url", help="Slack hook URL", type="string")
         arguments.add_option("--slack-channel", dest="slack_channel", help="Slack channel to message to", type="string")
         arguments.add_option("--slack-username", dest="slack_username", help="Sender's Slack username", type="string")
+        arguments.add_option("--telegram-token", dest="telegram_token", help="Telegram token", type="string")
+        arguments.add_option("--telegram-channel", dest="telegram_channel", help="Telegram channel", type="string")
 
         cli_arguments = arguments.parse_args()[0]
 
@@ -68,6 +70,8 @@ class OptionsResover:
         options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
         options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
         options["slack_username"] = cli_arguments.slack_username or config_file_options.get("Slack", "username")
+        options["telegram_token"] = cli_arguments.telegram_token or config_file_options.get("Telegram", "token")
+        options["telegram_channel"] = cli_arguments.telegram_channel or config_file_options.get("Telegram", "channel")
 
         # get queue specific condition values if any, else construct from the generic one
         conditions = OptionsResover.construct_conditions(options, cli_arguments, config_file_options)

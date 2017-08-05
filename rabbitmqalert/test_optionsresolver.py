@@ -228,6 +228,10 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "url": "foo-slack-url",
                 "channel": "foo-slack-channel",
                 "username": "foo-slack-username"
+            },
+            "Telegram": {
+                "token": "foo-telegram-token",
+                "channel": "foo-telegram-channel"
             }
         }
 
@@ -263,6 +267,10 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "url": "foo-slack-url",
                 "channel": "foo-slack-channel",
                 "username": "foo-slack-username"
+            },
+            "Telegram": {
+                "token": "foo-telegram-token",
+                "channel": "foo-telegram-channel"
             }
         }
 
@@ -306,6 +314,10 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "url": "foo-slack-url",
                 "channel": "foo-slack-channel",
                 "username": "foo-slack-username"
+            },
+            "Telegram": {
+                "token": "foo-telegram-token",
+                "channel": "foo-telegram-channel"
             }
         }
 
