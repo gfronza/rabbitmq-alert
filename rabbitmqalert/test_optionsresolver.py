@@ -41,7 +41,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--slack-url", "foo-slack-url",
             "--slack-channel", "foo-slack-channel",
             "--slack-username", "foo-slack-username",
-            "--telegram-token", "foo-telegram-token",
+            "--telegram-bot-id", "foo-telegram-bot-id",
             "--telegram-channel", "foo-telegram-channel"
         ]
 
@@ -70,7 +70,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
-        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
@@ -121,7 +121,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-username", options_result["slack_username"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
-        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_overrides_config_file_option_when_option_given_from_cli(self):
@@ -172,7 +172,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
-        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_returns_options_when_config_file_found_with_multiple_queue_specific_conditions(self):
@@ -215,7 +215,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-url", options_result["slack_url"])
         self.assertEquals("foo-slack-channel", options_result["slack_channel"])
         self.assertEquals("foo-slack-username", options_result["slack_username"])
-        self.assertEquals("foo-telegram-token", options_result["telegram_token"])
+        self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     @staticmethod
@@ -252,7 +252,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "username": "foo-slack-username"
             },
             "Telegram": {
-                "token": "foo-telegram-token",
+                "bot_id": "foo-telegram-bot-id",
                 "channel": "foo-telegram-channel"
             }
         }
@@ -291,7 +291,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "username": "foo-slack-username"
             },
             "Telegram": {
-                "token": "foo-telegram-token",
+                "bot_id": "foo-telegram-bot-id",
                 "channel": "foo-telegram-channel"
             }
         }
@@ -338,7 +338,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "username": "foo-slack-username"
             },
             "Telegram": {
-                "token": "foo-telegram-token",
+                "bot_id": "foo-telegram-bot-id",
                 "channel": "foo-telegram-channel"
             }
         }
