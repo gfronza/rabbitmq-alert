@@ -66,12 +66,16 @@ class OptionsResover:
         options["email_subject"] = cli_arguments.email_subject or config_file_options.get("Email", "subject")
         options["email_server"] = cli_arguments.email_server or config_file_options.get("Email", "host")
         options["email_password"] = cli_arguments.email_password or config_file_options.get("Email", "password")
-        options["email_ssl"] = cli_arguments.email_ssl or config_file_options.getboolean("Email", "ssl")
         options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
         options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
         options["slack_username"] = cli_arguments.slack_username or config_file_options.get("Slack", "username")
         options["telegram_bot_id"] = cli_arguments.telegram_bot_id or config_file_options.get("Telegram", "bot_id")
         options["telegram_channel"] = cli_arguments.telegram_channel or config_file_options.get("Telegram", "channel")
+
+        if config_file_options.has_section("Email"):
+            options["email_ssl"] = config_file_options.getboolean("Email", "ssl")
+        else:
+            options["email_ssl"] = cli_arguments.email_ssl
 
         # get queue specific condition values if any, else construct from the generic one
         conditions = OptionsResover.construct_conditions(options, cli_arguments, config_file_options)
