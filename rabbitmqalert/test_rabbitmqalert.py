@@ -148,10 +148,45 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
-        rmqa.send_notification(options, "")
         rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once()
+
+    def test_send_notification_calles_login_when_email_password_is_set(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        options = self.construct_options()
+        options["email_password"] = "password"
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        rabbitmqalert.smtplib.SMTP().login.assert_called_once()
+
+    def test_send_notification_not_call_login_when_email_password_not_set(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        options = self.construct_options()
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        rabbitmqalert.smtplib.SMTP().login.assert_not_called()
+
+    def test_send_notification_sends_email_with_ssl_when_email_ssl_is_set(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        options = self.construct_options()
+        options["email_ssl"] = True
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        rabbitmqalert.smtplib.SMTP_SSL().sendmail.assert_called_once()
 
     def test_send_notification_not_send_email_when_email_to_not_set(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
@@ -160,12 +195,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
-        rmqa.send_notification(options, "")
         rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_not_called()
 
-    def test_send_notification_sends_to_slack_when_options_are_set(self):
+    def test_send_notification_sends_to_slack_and_telegram_when_options_are_set(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
         options = self.construct_options()
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -174,7 +209,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.urllib2 = mock.MagicMock()
         rmqa.send_notification(options, "")
 
-        rabbitmqalert.urllib2.urlopen.assert_called_once()
+        rabbitmqalert.urllib2.urlopen.assert_called()
 
     def test_send_notification_not_send_to_slack_when_any_option_not_set(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
@@ -186,7 +221,21 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.urllib2 = mock.MagicMock()
         rmqa.send_notification(options, "")
 
-        rabbitmqalert.urllib2.urlopen.assert_not_called()
+        # Assure only telegram is called
+        rabbitmqalert.urllib2.urlopen.assert_called_once()
+
+    def test_send_notification_not_send_to_telegram_when_any_option_not_set(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        options = self.construct_options()
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        # Assure only slack is called
+        rabbitmqalert.urllib2.urlopen.assert_called_once()
 
     @staticmethod
     def construct_options():
@@ -210,9 +259,13 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             "email_from": "bar@foobar.com",
             "email_subject": "foo %s %s",
             "email_server": "mail.foobar.com",
+            "email_password": "",
+            "email_ssl": False,
             "slack_url": "http://foo.com",
             "slack_channel": "channel",
-            "slack_username": "username"
+            "slack_username": "username",
+            "telegram_bot_id": "foo_bot",
+            "telegram_channel": "foo_channel"
         }
 
         return options

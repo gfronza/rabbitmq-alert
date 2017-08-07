@@ -30,9 +30,13 @@ class OptionsResover:
         arguments.add_option("--email-from", dest="email_from", help="The sender email address", type="string")
         arguments.add_option("--email-subject", dest="email_subject", help="The email subject", type="string")
         arguments.add_option("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type="string")
+        arguments.add_option("--email-password", dest="email_password", help="The password for the authentication on the mail server", type="string")
+        arguments.add_option("--email-ssl", dest="email_ssl", help="Use SSL to send email", action="store_true", default=False)
         arguments.add_option("--slack-url", dest="slack_url", help="Slack hook URL", type="string")
         arguments.add_option("--slack-channel", dest="slack_channel", help="Slack channel to message to", type="string")
         arguments.add_option("--slack-username", dest="slack_username", help="Sender's Slack username", type="string")
+        arguments.add_option("--telegram-bot-id", dest="telegram_bot_id", help="Telegram bot id", type="string")
+        arguments.add_option("--telegram-channel", dest="telegram_channel", help="Telegram channel", type="string")
 
         cli_arguments = arguments.parse_args()[0]
 
@@ -61,9 +65,17 @@ class OptionsResover:
         options["email_from"] = cli_arguments.email_from or config_file_options.get("Email", "from")
         options["email_subject"] = cli_arguments.email_subject or config_file_options.get("Email", "subject")
         options["email_server"] = cli_arguments.email_server or config_file_options.get("Email", "host")
+        options["email_password"] = cli_arguments.email_password or config_file_options.get("Email", "password")
         options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
         options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
         options["slack_username"] = cli_arguments.slack_username or config_file_options.get("Slack", "username")
+        options["telegram_bot_id"] = cli_arguments.telegram_bot_id or config_file_options.get("Telegram", "bot_id")
+        options["telegram_channel"] = cli_arguments.telegram_channel or config_file_options.get("Telegram", "channel")
+
+        if config_file_options.has_section("Email"):
+            options["email_ssl"] = config_file_options.getboolean("Email", "ssl")
+        else:
+            options["email_ssl"] = cli_arguments.email_ssl
 
         # get queue specific condition values if any, else construct from the generic one
         conditions = OptionsResover.construct_conditions(options, cli_arguments, config_file_options)

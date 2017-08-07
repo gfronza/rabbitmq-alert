@@ -86,6 +86,12 @@ class RabbitMQAlert:
         if "email_to" in options and options["email_to"]:
             server = smtplib.SMTP(options["email_server"], 25)
 
+            if "email_ssl" in options and options["email_ssl"]:
+                server = smtplib.SMTP_SSL(options["email_server"], 465)
+
+            if "email_password" in options and options["email_password"]:
+                server.login(options["email_from"], options["email_password"])
+
             recipients = options["email_to"]
             # add subject as header before message text
             subject_email = options["email_subject"] % (options["host"], options["queue"])
@@ -100,6 +106,14 @@ class RabbitMQAlert:
             slack_payload = '{"channel": "#%s", "username": "%s", "text": "%s"}' % (options["slack_channel"], options["slack_username"], text_slack)
 
             request = urllib2.Request(options["slack_url"], slack_payload)
+            response = urllib2.urlopen(request)
+            response.close()
+
+        if "telegram_bot_id" in options and options["telegram_bot_id"] and "telegram_channel" in options and options["telegram_channel"]:
+            text_telegram = "%s: %s" % (options["queue"], text)
+            telegram_url = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s" % (options["telegram_bot_id"], options["telegram_channel"], text_telegram)
+
+            request = urllib2.Request(telegram_url)
             response = urllib2.urlopen(request)
             response.close()
 
