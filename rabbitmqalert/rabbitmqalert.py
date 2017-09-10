@@ -37,12 +37,24 @@ class RabbitMQAlert:
         url = "http://%s:%s/api/connections" % (options["host"], options["port"])
         data = self.send_request(url, options)
 
+        open_connections = len(data)
+
+        open_connections_min = options["conditions"][queue].get("open_connections")
+
+        if open_connections is not None and open_connections < open_connections_min:
+            self.send_notification(options, "open_connections < %s" % str(open_connections_min))
+
+    def check_consumer_conditions(self, options):
+        queue = options["queue"]
+        url = "http://%s:%s/api/consumers" % (options["host"], options["port"])
+        data = self.send_request(url, options)
+
         consumers_connected = len(data)
 
-        consumers_con = options["conditions"][queue].get("consumers_connected")
+        consumers_connected_min = options["conditions"][queue].get("consumers_connected")
 
-        if consumers_con is not None and consumers_connected < consumers_con:
-            self.send_notification(options, "consumers_connected < %s" % str(consumers_con))
+        if consumers_connected is not None and consumers_connected < consumers_connected_min:
+            self.send_notification(options, "consumers_connected < %s" % str(consumers_connected_min))
 
     def check_node_conditions(self, options):
         queue = options["queue"]
@@ -131,8 +143,11 @@ if __name__ ==  "__main__":
                     or "total_queue_size" in queue_conditions:
                 rabbitmqalert.check_queue_conditions(options)
 
-            if "consumers_connected" in queue_conditions:
+            if "open_connections" in queue_conditions:
                 rabbitmqalert.check_connection_conditions(options)
+
+            if "consumers_connected" in queue_conditions:
+                rabbitmqalert.check_consumer_conditions(options)
 
             if "nodes_running" in queue_conditions:
                 rabbitmqalert.check_node_conditions(options)

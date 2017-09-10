@@ -34,6 +34,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--unacknowledged-queue-size", "30",
             "--total-queue-size", "40",
             "--consumers-connected", "50",
+            "--open-connections", "51",
             "--nodes-running", "60",
             "--node-memory-used", "70",
             "--email-to", "foo-email-to",
@@ -63,6 +64,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
         self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
         self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
         self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
@@ -91,6 +93,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--unacknowledged-queue-size", "30",
             "--total-queue-size", "40",
             "--consumers-connected", "50",
+            "--open-connections", "51",
             "--nodes-running", "60",
             "--node-memory-used", "70",
             "--email-to", "foo-email-to",
@@ -119,6 +122,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
         self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
         self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
         self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
@@ -168,6 +172,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
         self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
         self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
         self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
@@ -221,6 +226,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
         self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
         self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
         self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
@@ -258,12 +264,14 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
         self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
         self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
         self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
         self.assertEquals(30, options_result["conditions"]["bar-queue"]["ready_queue_size"])
         self.assertEquals(40, options_result["conditions"]["bar-queue"]["unack_queue_size"])
         self.assertEquals(50, options_result["conditions"]["bar-queue"]["total_queue_size"])
         self.assertEquals(60, options_result["conditions"]["bar-queue"]["consumers_connected"])
+        self.assertEquals(61, options_result["conditions"]["bar-queue"]["open_connections"])
         self.assertEquals(70, options_result["conditions"]["bar-queue"]["nodes_running"])
         self.assertEquals(80, options_result["conditions"]["bar-queue"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
@@ -295,6 +303,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
                 "consumers_connected": "50",
+                "open_connections": "51",
                 "nodes_running": "60",
                 "node_memory_used": "70"
             },
@@ -334,6 +343,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
                 "consumers_connected": "50",
+                "open_connections": "51",
                 "nodes_running": "60",
                 "node_memory_used": "70"
             },
@@ -373,6 +383,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
                 "consumers_connected": "50",
+                "open_connections": "51",
                 "nodes_running": "60",
                 "node_memory_used": "70"
             },
@@ -381,6 +392,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "unack_queue_size": "40",
                 "total_queue_size": "50",
                 "consumers_connected": "60",
+                "open_connections": "61",
                 "nodes_running": "70",
                 "node_memory_used": "80"
             },

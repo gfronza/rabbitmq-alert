@@ -71,10 +71,9 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa.send_notification.assert_called_once()
 
-    def test_check_connection_conditions_consumers_connected_not_send_notification_when_exceeding_option(self):
+    def test_check_connection_conditions_open_connections_not_send_notification_when_exceeding_option(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
         response = self.construct_response_connection()
-        response["consumers_connected"] = 2
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
@@ -85,9 +84,37 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa.send_notification.assert_not_called()
 
-    def test_check_connection_conditions_consumers_connected_send_notification_when_beneath_option(self):
+    def test_check_connection_conditions_open_connections_send_notification_when_beneath_option(self):
         rmqa = rabbitmqalert.RabbitMQAlert()
         response = self.construct_response_connection()
+        response.pop("connection_foo")
+        response.pop("connection_bar")
+        rmqa.send_request = mock.MagicMock(return_value=response)
+
+        options = self.construct_options()
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rmqa.send_notification = mock.MagicMock()
+        rmqa.check_connection_conditions(options)
+
+        rmqa.send_notification.assert_called_once()
+
+    def test_check_consumer_conditions_consumers_connected_not_send_notification_when_exceeding_option(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        response = self.construct_response_consumer()
+        rmqa.send_request = mock.MagicMock(return_value=response)
+
+        options = self.construct_options()
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rmqa.send_notification = mock.MagicMock()
+        rmqa.check_consumer_conditions(options)
+
+        rmqa.send_notification.assert_not_called()
+
+    def test_check_consumer_conditions_consumers_connected_send_notification_when_beneath_option(self):
+        rmqa = rabbitmqalert.RabbitMQAlert()
+        response = self.construct_response_consumer()
         response.pop("consumer_foo")
         response.pop("consumer_bar")
         rmqa.send_request = mock.MagicMock(return_value=response)
@@ -96,7 +123,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_connection_conditions(options)
+        rmqa.check_consumer_conditions(options)
 
         rmqa.send_notification.assert_called_once()
 
@@ -251,6 +278,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
                     "unack_queue_size": 0,
                     "total_queue_size": 0,
                     "consumers_connected": 1,
+                    "open_connections": 1,
                     "nodes_running": 1,
                     "node_memory_used": 1
                 }
@@ -280,6 +308,13 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
     @staticmethod
     def construct_response_connection():
+        return {
+            "connection_foo": {},
+            "connection_bar": {}
+        }
+
+    @staticmethod
+    def construct_response_consumer():
         return {
             "consumer_foo": {},
             "consumer_bar": {}

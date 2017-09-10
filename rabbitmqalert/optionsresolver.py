@@ -23,6 +23,7 @@ class OptionsResover:
         arguments.add_option("--unacknowledged-queue-size", dest="unack_queue_size", help="Size of the Unacknowledged messages on the queue to alert as warning", type="int")
         arguments.add_option("--total-queue-size", dest="total_queue_size", help="Size of the Total messages on the queue to alert as warning", type="int")
         arguments.add_option("--consumers-connected", dest="consumers_connected", help="The number of consumers that should be connected", type="int")
+        arguments.add_option("--open-connections", dest="open_connections", help="The number of open connections", type="int")
         arguments.add_option("--nodes-running", dest="nodes_running", help="The number of nodes running", type="int")
         arguments.add_option("--node-memory-used", dest="node_memory_used", help="Memory used by each node in MBs", type="int")
 
@@ -94,6 +95,7 @@ class OptionsResover:
             default_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint("Conditions", "unack_queue_size")
             default_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint("Conditions", "total_queue_size")
             default_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint("Conditions", "consumers_connected")
+            default_conditions["open_connections"] = cli_arguments.open_connections or config_file_options.getint("Conditions", "open_connections")
             default_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint("Conditions", "nodes_running")
             default_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint("Conditions", "node_memory_used")
         except:
@@ -110,6 +112,7 @@ class OptionsResover:
                     queue_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint(queue_conditions_section_name, "unack_queue_size")
                     queue_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint(queue_conditions_section_name, "total_queue_size")
                     queue_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint(queue_conditions_section_name, "consumers_connected")
+                    queue_conditions["open_connections"] = cli_arguments.open_connections or config_file_options.getint(queue_conditions_section_name, "open_connections")
                     queue_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint(queue_conditions_section_name, "nodes_running")
                     queue_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint(queue_conditions_section_name, "node_memory_used")
                     conditions[queue] = queue_conditions

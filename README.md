@@ -10,6 +10,7 @@ Which conditions?
 - Unacknowledged messages
 - Total queued messages
 - Number of connected consumers
+- Number of open connections
 - Number of nodes running
 - Memory used by each node in MBs
 
