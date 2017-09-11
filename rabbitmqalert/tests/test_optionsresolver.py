@@ -3,7 +3,7 @@
 
 import unittest
 import mock
-import optionsresolver
+from rabbitmqalert import optionsresolver
 import ConfigParser
 
 
