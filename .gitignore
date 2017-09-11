@@ -1,2 +1,4 @@
 **/*.pyc
 .idea/
+dist/
+rabbitmq_alert.egg-info/
