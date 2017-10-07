@@ -2,6 +2,7 @@
 
 from setuptools import setup, find_packages
 
+# remember to push a new tag after changing this!
 VERSION = "1.0.4"
 
 
@@ -14,7 +15,7 @@ setup(
     author="Germano Fronza, Kostas Milonas",
     author_email="germano.inf@gmail.com",
     url="https://github.com/gfronza/rabbitmq-alert",
-    download_url="https://github.com/gfronza/rabbitmq-alert/tarball/1.0.4",
+    download_url="https://github.com/gfronza/rabbitmq-alert/tarball/"+VERSION,
     keywords=["rabbitmq", "alert", "monitor"],
     classifiers=[],
     entry_points={
