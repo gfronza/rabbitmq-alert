@@ -129,7 +129,8 @@ class RabbitMQAlert:
             response = urllib2.urlopen(request)
             response.close()
 
-if __name__ ==  "__main__":
+
+def main():
     rabbitmqalert = RabbitMQAlert()
     options = optionsresolver.OptionsResover.setup_options()
 
@@ -138,8 +139,8 @@ if __name__ ==  "__main__":
             options["queue"] = queue
             queue_conditions = options["conditions"][queue]
 
-            if "ready_queue_size" in queue_conditions\
-                    or "unack_queue_size" in queue_conditions\
+            if "ready_queue_size" in queue_conditions \
+                    or "unack_queue_size" in queue_conditions \
                     or "total_queue_size" in queue_conditions:
                 rabbitmqalert.check_queue_conditions(options)
 
@@ -153,3 +154,7 @@ if __name__ ==  "__main__":
                 rabbitmqalert.check_node_conditions(options)
 
         time.sleep(options["check_rate"])
+
+
+if __name__ == "__main__":
+    main()
