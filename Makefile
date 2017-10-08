@@ -2,8 +2,8 @@ deps-dev:
 	sudo pip install -r requirements_dev
 
 test:
-	rabbitmqalert/tests/test_rabbitmqalert.py -b
-	rabbitmqalert/tests/test_optionsresolver.py -b
+	python2 -m rabbitmqalert.tests.test_rabbitmqalert
+	python2 -m rabbitmqalert.tests.test_optionsresolver
 
 clean:
 	rm -rf dist/ rabbitmq_alert.egg-info/

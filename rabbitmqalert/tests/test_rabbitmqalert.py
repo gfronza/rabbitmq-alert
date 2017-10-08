@@ -3,8 +3,8 @@
 
 import unittest
 import mock
-from rabbitmqalert import rabbitmqalert
-from rabbitmqalert import optionsresolver
+from . import rabbitmqalert
+from . import optionsresolver
 
 
 class RabbitMQAlertTestCase(unittest.TestCase):
