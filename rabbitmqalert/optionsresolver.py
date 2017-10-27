@@ -5,6 +5,8 @@ import optparse
 import ConfigParser
 import os.path
 
+DEFAULT_CONFIG_FILE_PATH = "/etc/rabbitmq-alert/config.ini"
+
 
 class OptionsResover:
     @staticmethod
@@ -45,7 +47,9 @@ class OptionsResover:
         config_file_options = ConfigParser.ConfigParser(vars(cli_arguments))
 
         options = dict()
-        if cli_arguments.config_file:
+        if os.path.isfile(DEFAULT_CONFIG_FILE_PATH) and not cli_arguments.config_file:
+            config_file_options.read(DEFAULT_CONFIG_FILE_PATH)
+        elif cli_arguments.config_file:
             if not os.path.isfile(cli_arguments.config_file):
                 print "The provided configuration file does not exist."
                 exit(1)
