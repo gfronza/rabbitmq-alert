@@ -1,2 +1,2 @@
-include example.ini
+include config.ini.example
 include README.rst

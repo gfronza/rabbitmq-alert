@@ -50,6 +50,9 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--telegram-channel", "foo-telegram-channel"
         ]
 
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, False]
+
         optionsresolver.optparse.sys.argv[1:] = options
         options_result = resolver.setup_options()
 
@@ -156,7 +159,9 @@ class OptionsResolverTestCase(unittest.TestCase):
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
-        optionsresolver.os.path.isfile = mock.MagicMock(return_value=True)
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
         options_result = optionsresolver.OptionsResover.setup_options()
@@ -196,7 +201,9 @@ class OptionsResolverTestCase(unittest.TestCase):
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
-        optionsresolver.os.path.isfile = mock.MagicMock(return_value=True)
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
         options_result = optionsresolver.OptionsResover.setup_options()
@@ -210,7 +217,9 @@ class OptionsResolverTestCase(unittest.TestCase):
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
-        optionsresolver.os.path.isfile = mock.MagicMock(return_value=True)
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
         options_result = optionsresolver.OptionsResover.setup_options()
@@ -248,7 +257,9 @@ class OptionsResolverTestCase(unittest.TestCase):
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
-        optionsresolver.os.path.isfile = mock.MagicMock(return_value=True)
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
         options_result = optionsresolver.OptionsResover.setup_options()
@@ -285,6 +296,27 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-slack-username", options_result["slack_username"])
         self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
+
+    def test_setup_options_reads_default_config_file_when_exists_when_no_explicit_config_file_given(self):
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [True, False]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
+
+        optionsresolver.OptionsResover.setup_options()
+        optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with(optionsresolver.DEFAULT_CONFIG_FILE_PATH)
+
+    def test_setup_options_does_not_read_default_config_file_when_explicit_config_file_given(self):
+        options = ["--config", "foo.ini"]
+
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [True, True]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
+        optionsresolver.optparse.sys.argv[1:] = options
+
+        optionsresolver.OptionsResover.setup_options()
+        optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with("foo.ini")
 
     @staticmethod
     def construct_config_file_options_with_generic_conditions():
