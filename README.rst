@@ -32,14 +32,29 @@ Currently the following are supported:
 Installation
 ============
 
-For now you have to clone the repository:
+Use the ``PIP`` command, which should already exist in your Linux installation:
 
 ::
 
-    git clone https://github.com/gfronza/rabbitmq-alert.git
+    pip install rabbitmq-alert
 
 Usage
 =====
+
+Execute with the global configuration file
+------------------------------------------
+Copy the example configuration file to the default path of the global configuration file:
+
+::
+
+    sudo cp /etc/rabbitmq-alert/config.ini.example /etc/rabbitmq-alert/config.ini
+
+| Edit it with you preferred settings. Then you are ready to execute ``rabbitmq-alert``
+| using the global configuration file. Just execute:
+
+::
+
+    rabbitmq-alert
 
 Execute with options
 --------------------
@@ -52,27 +67,29 @@ Example:
 
 ::
 
-    ./rabbitmq-alert.py \
+    rabbitmq-alert \
         --host=my-server --port=55672 --username=guest --password=guest \
         --vhost=%2F --queue=my_queue1,my_queue2 --ready-queue-size=3 --check-rate=300 \
         --email-to=admin@example.com --email-from=admin@example.com \
         --email-subject="RabbitMQ alert at %s - %s" --email-server=localhost
 
-Execute with a configuration file
----------------------------------
+Execute with a custom configuration file
+----------------------------------------
 
-| Alternatively, you can use a configuration file which is a lot
-  cleaner. For the required format, take a look
-| at the ``example.ini`` file contained in the project.
+| Alternatively, you can use a custom configuration file.
+  For the required format, take a look
+| at the ``/etc/rabbitmq-alert/config.ini.example`` file.
 
 Then execute ``rabbitmq-alert`` with the configuration file option:
 
 ::
 
-    ./rabbitmq-alert.py -c my_config.ini
+    rabbitmq-alert -c my_config.ini
 
-| You can also define queue specific conditions in the configuration
-  file, in case you want to have fine-tuned options for each queue.
+Conditions
+----------
+| Except conditions for all queues, you can also define queue specific conditions
+  in the configuration file, in case you want to have fine-tuned options for each queue.
 | Just create a ``[Conditions]`` section for each queue. Example:
 
 ::
