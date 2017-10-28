@@ -86,10 +86,10 @@ Then execute ``rabbitmq-alert`` with the configuration file option:
 
     sudo rabbitmq-alert -c my_config.ini
 
-Conditions
-----------
+Different options per queue
+---------------------------
 | Except conditions for all queues, you can also define queue specific conditions
-  in the configuration file, in case you want to have fine-tuned options for each queue.
+| in the configuration file, in case you want to have fine-tuned options for each queue.
 | Just create a ``[Conditions]`` section for each queue. Example:
 
 ::
@@ -115,6 +115,19 @@ Logging
 
 | You can find the logs of ``rabbitmq-alert`` to ``/var/log/rabbitmq-alert/``.
 | Log files are rotated in a daily basis.
+
+Execute in a container
+----------------------
+
+| There is a docker image for the project. First, you have to create a configuration file
+| for ``rabbitmq-alert``, which will then be copied into the container. Then you can run
+| ``rabbitmq-alert`` inside a container.
+
+::
+
+    docker run -d --name rabbitmq-alert -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
+
+For the configuration file, advise the ``config.ini.example`` that exists in the project's repository.
 
 Contribute
 ==========
@@ -149,3 +162,47 @@ Do add tests yourself for the code you contribute to ensure the quality
 of the project.
 
 Happy coding :-)
+
+Build and publish a new container version
+-----------------------------------------
+
+To build a new image version of the project:
+
+::
+
+    docker build --no-cache -t mylkoh/rabbitmq-alert:1.2.2 -t mylkoh/rabbitmq-alert:latest .
+
+Publish the image:
+
+::
+
+    docker push mylkoh/rabbitmq-alert
+
+Testing the container
+---------------------
+
+Create a network that all containers will belong to:
+
+::
+
+    docker network create rabbitmq-alert
+
+
+Run ``rabbitmq`` into a container:
+
+::
+
+    docker run -d --name some-rabbit --net rabbitmq-alert -p 8080:15672 rabbitmq:3-management
+
+| You can then go to http://localhost:8080 in a browser to use the management plugin.
+| The username and password are both ``guest``. Create a fake SMTP server:
+
+::
+
+    docker run -d --name fake-smtp --net rabbitmq-alert -p 25:25 munkyboy/fakesmtp
+
+Now, run ``rabbitmq-alert`` using the same network:
+
+::
+
+    docker run -d --name rabbitmq-alert --net rabbitmq-alert -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
