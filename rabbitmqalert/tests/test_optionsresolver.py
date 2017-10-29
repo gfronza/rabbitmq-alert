@@ -22,7 +22,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
     def test_setup_options_returns_options_when_options_given_and_no_config_file(self):
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options = [
             "--host", "foo-host",
             "--port", "foo-port",
@@ -85,7 +85,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
     def test_setup_options_without_ssl_return_options_when_options_without_ssl_given_and_no_config_file(self):
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options = [
             "--host", "foo-host",
             "--port", "foo-port",
@@ -144,7 +144,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options = ["--config", "foo.ini"]
 
         optionsresolver.os.path.isfile = mock.MagicMock(return_value=False)
@@ -169,7 +169,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
@@ -214,7 +214,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options_result = resolver.setup_options()
 
         self.assertEquals(["foo-email-to-new"], options_result["email_to"])
@@ -233,7 +233,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
@@ -276,7 +276,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
         options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
@@ -319,7 +319,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
 
         resolver.setup_options()
         optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with(optionsresolver.CONFIG_FILE_PATH)
@@ -334,7 +334,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
 
         resolver.setup_options()
         optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with("foo.ini")
@@ -346,7 +346,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
 
         resolver.setup_options()
         logger.info.assert_called_once()
@@ -361,7 +361,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
 
         resolver.setup_options()
         logger.info.assert_called_once()
@@ -376,7 +376,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.optparse.sys.argv[1:] = options
 
         logger = mock.MagicMock()
-        resolver = optionsresolver.OptionsResover(logger)
+        resolver = optionsresolver.OptionsResolver(logger)
 
         with self.assertRaises(SystemExit) as context_manager:
             resolver.setup_options()

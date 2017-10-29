@@ -10,11 +10,11 @@ from . import optionsresolver
 class RabbitMQAlertTestCase(unittest.TestCase):
     def setUp(self):
         rabbitmqalert.urllib2_real = rabbitmqalert.urllib2
-        optionsresolver.OptionsResover.setup_options_real = optionsresolver.OptionsResover.setup_options
+        optionsresolver.OptionsResolver.setup_options_real = optionsresolver.OptionsResolver.setup_options
 
     def tearDown(self):
         rabbitmqalert.urllib2 = rabbitmqalert.urllib2_real
-        optionsresolver.OptionsResover.setup_options = optionsresolver.OptionsResover.setup_options_real
+        optionsresolver.OptionsResolver.setup_options = optionsresolver.OptionsResolver.setup_options_real
 
     def test_check_queue_conditions_not_send_notification_when_not_exceeding_options(self):
         logger = mock.MagicMock()
@@ -23,7 +23,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_queue_conditions(options)
@@ -38,7 +38,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_queue_conditions(options)
@@ -53,7 +53,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_queue_conditions(options)
@@ -68,7 +68,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_queue_conditions(options)
@@ -82,7 +82,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_connection_conditions(options)
@@ -98,7 +98,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_connection_conditions(options)
@@ -112,7 +112,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_consumer_conditions(options)
@@ -128,7 +128,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_consumer_conditions(options)
@@ -142,7 +142,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_node_conditions(options)
@@ -158,7 +158,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_node_conditions(options)
@@ -173,7 +173,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_request = mock.MagicMock(return_value=response)
 
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rmqa.send_notification = mock.MagicMock()
         rmqa.check_node_conditions(options)
@@ -184,7 +184,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         logger = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -197,7 +197,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_password"] = "password"
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -209,7 +209,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         logger = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -222,7 +222,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_ssl"] = True
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -235,7 +235,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_to"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -247,7 +247,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         logger = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -260,7 +260,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["slack_url"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -274,7 +274,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -289,7 +289,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options = self.construct_options()
         options["slack_url"] = None
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -304,7 +304,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options["email_to"] = None
         options["slack_url"] = None
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -318,7 +318,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options = self.construct_options()
         options["email_to"] = None
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -333,7 +333,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options["email_to"] = None
         options["slack_url"] = None
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -347,7 +347,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options = self.construct_options()
         options["email_to"] = None
         options["slack_url"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
@@ -362,7 +362,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         options["email_to"] = None
         options["slack_url"] = None
         options["telegram_bot_id"] = None
-        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()

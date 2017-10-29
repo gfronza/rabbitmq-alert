@@ -8,7 +8,7 @@ import os.path
 CONFIG_FILE_PATH = "/etc/rabbitmq-alert/config.ini"
 
 
-class OptionsResover:
+class OptionsResolver:
     def __init__(self, logger):
         self.log = logger
 
@@ -87,7 +87,7 @@ class OptionsResover:
             options["email_ssl"] = cli_arguments.email_ssl
 
         # get queue specific condition values if any, else construct from the generic one
-        conditions = OptionsResover.construct_conditions(options, cli_arguments, config_file_options)
+        conditions = OptionsResolver.construct_conditions(options, cli_arguments, config_file_options)
         options = dict(options.items() + conditions.items())
 
         return options

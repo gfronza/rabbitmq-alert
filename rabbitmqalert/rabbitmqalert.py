@@ -153,7 +153,7 @@ def main():
 
     rabbitmq_alert = RabbitMQAlert(log)
 
-    opt_resolver = optionsresolver.OptionsResover(log)
+    opt_resolver = optionsresolver.OptionsResolver(log)
     options = opt_resolver.setup_options()
 
     while True:
