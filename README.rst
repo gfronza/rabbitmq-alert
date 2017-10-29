@@ -36,7 +36,7 @@ Use the ``PIP`` command, which should already exist in your Linux installation:
 
 ::
 
-    pip install rabbitmq-alert
+    sudo pip install rabbitmq-alert
 
 Usage
 =====
@@ -54,7 +54,7 @@ Copy the example configuration file to the default path of the global configurat
 
 ::
 
-    rabbitmq-alert
+    sudo rabbitmq-alert
 
 Execute with options
 --------------------
@@ -67,7 +67,7 @@ Example:
 
 ::
 
-    rabbitmq-alert \
+    sudo rabbitmq-alert \
         --host=my-server --port=55672 --username=guest --password=guest \
         --vhost=%2F --queue=my_queue1,my_queue2 --ready-queue-size=3 --check-rate=300 \
         --email-to=admin@example.com --email-from=admin@example.com \
@@ -84,7 +84,7 @@ Then execute ``rabbitmq-alert`` with the configuration file option:
 
 ::
 
-    rabbitmq-alert -c my_config.ini
+    sudo rabbitmq-alert -c my_config.ini
 
 Conditions
 ----------
@@ -109,6 +109,12 @@ section of the configuration file:
     ...
     queues=my-queue,my-other-queue
     ...
+
+Logging
+-------
+
+| You can find the logs of ``rabbitmq-alert`` to ``/var/log/rabbitmq-alert/``.
+| Log files are rotated in a daily basis.
 
 Contribute
 ==========

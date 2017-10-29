@@ -3,3 +3,4 @@
 
 from . import rabbitmqalert
 from . import optionsresolver
+from . import logger

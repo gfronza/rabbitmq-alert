@@ -17,7 +17,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         optionsresolver.OptionsResover.setup_options = optionsresolver.OptionsResover.setup_options_real
 
     def test_check_queue_conditions_not_send_notification_when_not_exceeding_options(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_queue()
         rmqa.send_request = mock.MagicMock(return_value=response)
 
@@ -30,7 +31,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_not_called()
 
     def test_check_queue_conditions_messages_ready_send_notification_when_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_queue()
         response["messages_ready"] = 2
         rmqa.send_request = mock.MagicMock(return_value=response)
@@ -44,7 +46,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_queue_conditions_messages_unacknowledged_send_notification_when_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_queue()
         response["messages_unacknowledged"] = 2
         rmqa.send_request = mock.MagicMock(return_value=response)
@@ -58,7 +61,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_queue_conditions_messages_send_notification_when_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_queue()
         response["messages"] = 2
         rmqa.send_request = mock.MagicMock(return_value=response)
@@ -72,7 +76,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_connection_conditions_open_connections_not_send_notification_when_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_connection()
         rmqa.send_request = mock.MagicMock(return_value=response)
 
@@ -85,7 +90,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_not_called()
 
     def test_check_connection_conditions_open_connections_send_notification_when_beneath_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_connection()
         response.pop("connection_foo")
         response.pop("connection_bar")
@@ -100,7 +106,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_consumer_conditions_consumers_connected_not_send_notification_when_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_consumer()
         rmqa.send_request = mock.MagicMock(return_value=response)
 
@@ -113,7 +120,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_not_called()
 
     def test_check_consumer_conditions_consumers_connected_send_notification_when_beneath_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_consumer()
         response.pop("consumer_foo")
         response.pop("consumer_bar")
@@ -128,7 +136,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_node_conditions_not_send_notification_when_normal(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_node()
         rmqa.send_request = mock.MagicMock(return_value=response)
 
@@ -141,7 +150,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_not_called()
 
     def test_check_node_conditions_send_notification_when_nodes_running_beneath_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_node()
         response.pop()
         response.pop()
@@ -156,7 +166,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_check_node_conditions_send_notification_when_node_memory_exceeding_option(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         response = self.construct_response_node()
         response[0]["mem_used"] = 2000000
         rmqa.send_request = mock.MagicMock(return_value=response)
@@ -170,7 +181,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.send_notification.assert_called_once()
 
     def test_send_notification_sends_email_when_email_to_is_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
@@ -181,7 +193,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once()
 
     def test_send_notification_calles_login_when_email_password_is_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_password"] = "password"
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -193,7 +206,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.smtplib.SMTP().login.assert_called_once()
 
     def test_send_notification_not_call_login_when_email_password_not_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
@@ -204,7 +218,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.smtplib.SMTP().login.assert_not_called()
 
     def test_send_notification_sends_email_with_ssl_when_email_ssl_is_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_ssl"] = True
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -216,7 +231,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.smtplib.SMTP_SSL().sendmail.assert_called_once()
 
     def test_send_notification_not_send_email_when_email_to_not_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["email_to"] = None
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -228,7 +244,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.smtplib.SMTP().sendmail.assert_not_called()
 
     def test_send_notification_sends_to_slack_and_telegram_when_options_are_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
 
@@ -239,7 +256,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.urllib2.urlopen.assert_called()
 
     def test_send_notification_not_send_to_slack_when_any_option_not_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["slack_url"] = None
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -252,7 +270,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.urllib2.urlopen.assert_called_once()
 
     def test_send_notification_not_send_to_telegram_when_any_option_not_set(self):
-        rmqa = rabbitmqalert.RabbitMQAlert()
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
         options = self.construct_options()
         options["telegram_bot_id"] = None
         optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
@@ -263,6 +282,93 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         # Assure only slack is called
         rabbitmqalert.urllib2.urlopen.assert_called_once()
+
+    def test_send_notification_logs_info_when_email_is_sent(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["slack_url"] = None
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_called_once()
+
+    def test_send_notification_does_not_log_info_when_email_not_sent(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["email_to"] = None
+        options["slack_url"] = None
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_not_called()
+
+    def test_send_notification_logs_info_when_sending_to_slack(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["email_to"] = None
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_called_once()
+
+    def test_send_notification_does_not_log_info_when_not_sending_to_slack(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["email_to"] = None
+        options["slack_url"] = None
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_not_called()
+
+    def test_send_notification_logs_info_when_sending_to_telegram(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["email_to"] = None
+        options["slack_url"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_called_once()
+
+    def test_send_notification_does_not_log_info_when_not_sending_to_telegra(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+        options = self.construct_options()
+        options["email_to"] = None
+        options["slack_url"] = None
+        options["telegram_bot_id"] = None
+        optionsresolver.OptionsResover.setup_options = mock.MagicMock(return_value=options)
+
+        rabbitmqalert.smtplib = mock.MagicMock()
+        rabbitmqalert.urllib2 = mock.MagicMock()
+        rmqa.send_notification(options, "")
+
+        logger.info.assert_not_called()
 
     @staticmethod
     def construct_options():

@@ -6,13 +6,19 @@ import json
 import time
 import smtplib
 import optionsresolver
+import logger
 
 
 class RabbitMQAlert:
+    def __init__(self, log):
+        self.log = log
+
     def check_queue_conditions(self, options):
         queue = options["queue"]
         url = "http://%s:%s/api/queues/%s/%s" % (options["host"], options["port"], options["vhost"], options["queue"])
         data = self.send_request(url, options)
+        if data is None:
+            return
 
         messages_ready = data.get("messages_ready")
         messages_unacknowledged = data.get("messages_unacknowledged")
@@ -36,6 +42,8 @@ class RabbitMQAlert:
         queue = options["queue"]
         url = "http://%s:%s/api/connections" % (options["host"], options["port"])
         data = self.send_request(url, options)
+        if data is None:
+            return
 
         open_connections = len(data)
 
@@ -48,6 +56,8 @@ class RabbitMQAlert:
         queue = options["queue"]
         url = "http://%s:%s/api/consumers" % (options["host"], options["port"])
         data = self.send_request(url, options)
+        if data is None:
+            return
 
         consumers_connected = len(data)
 
@@ -60,6 +70,8 @@ class RabbitMQAlert:
         queue = options["queue"]
         url = "http://%s:%s/api/nodes" % (options["host"], options["port"])
         data = self.send_request(url, options)
+        if data is None:
+            return
 
         nodes_running = len(data)
 
@@ -87,15 +99,16 @@ class RabbitMQAlert:
 
             data = json.loads(response)
             return data
-
-        except urllib2.HTTPError, e:
-            print "Error code %s hitting %s" % (e.code, url)
-            exit(1)
+        except (urllib2.HTTPError, urllib2.URLError) as e:
+            self.log.error("Error while consuming the API endpoint \"{0}\"".format(url))
+            return None
 
     def send_notification(self, options, body):
         text = "%s - %s" % (options["host"], body)
 
         if "email_to" in options and options["email_to"]:
+            self.log.info("Sending email notification: \"{0}\"".format(body))
+
             server = smtplib.SMTP(options["email_server"], 25)
 
             if "email_ssl" in options and options["email_ssl"]:
@@ -113,6 +126,8 @@ class RabbitMQAlert:
             server.quit()
 
         if "slack_url" in options and options["slack_url"] and "slack_channel" in options and options["slack_channel"] and "slack_username" in options and options["slack_username"]:
+            self.log.info("Sending Slack notification: \"{0}\"".format(body))
+
             # escape double quotes from possibly breaking the slack message payload
             text_slack = text.replace("\"", "\\\"")
             slack_payload = '{"channel": "#%s", "username": "%s", "text": "%s"}' % (options["slack_channel"], options["slack_username"], text_slack)
@@ -122,6 +137,8 @@ class RabbitMQAlert:
             response.close()
 
         if "telegram_bot_id" in options and options["telegram_bot_id"] and "telegram_channel" in options and options["telegram_channel"]:
+            self.log.info("Sending Telegram notification: \"{0}\"".format(body))
+
             text_telegram = "%s: %s" % (options["queue"], text)
             telegram_url = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s" % (options["telegram_bot_id"], options["telegram_channel"], text_telegram)
 
@@ -131,8 +148,13 @@ class RabbitMQAlert:
 
 
 def main():
-    rabbitmqalert = RabbitMQAlert()
-    options = optionsresolver.OptionsResover.setup_options()
+    log = logger.Logger()
+    log.info("Starting application...")
+
+    rabbitmq_alert = RabbitMQAlert(log)
+
+    opt_resolver = optionsresolver.OptionsResover(log)
+    options = opt_resolver.setup_options()
 
     while True:
         for queue in options["queues"]:
@@ -142,16 +164,16 @@ def main():
             if "ready_queue_size" in queue_conditions \
                     or "unack_queue_size" in queue_conditions \
                     or "total_queue_size" in queue_conditions:
-                rabbitmqalert.check_queue_conditions(options)
+                rabbitmq_alert.check_queue_conditions(options)
 
             if "open_connections" in queue_conditions:
-                rabbitmqalert.check_connection_conditions(options)
+                rabbitmq_alert.check_connection_conditions(options)
 
             if "consumers_connected" in queue_conditions:
-                rabbitmqalert.check_consumer_conditions(options)
+                rabbitmq_alert.check_consumer_conditions(options)
 
             if "nodes_running" in queue_conditions:
-                rabbitmqalert.check_node_conditions(options)
+                rabbitmq_alert.check_node_conditions(options)
 
         time.sleep(options["check_rate"])
 

@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # remember to push a new tag after changing this!
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 setup(
     name="rabbitmq-alert",
@@ -11,7 +11,7 @@ setup(
     long_description=open("README.rst").read(),
     packages=find_packages(exclude=["*tests*"]),
     description="Send notifications when predefined conditions are met",
-    author="Germano Fronza, Kostas Milonas",
+    author="Germano Fronza, Kostas Milonas, velika12",
     author_email="germano.inf@gmail.com",
     url="https://github.com/gfronza/rabbitmq-alert",
     download_url="https://github.com/gfronza/rabbitmq-alert/tarball/"+VERSION,
@@ -22,5 +22,8 @@ setup(
             "rabbitmq-alert = rabbitmqalert:rabbitmqalert.main"
         ]
     },
-    data_files=[('/etc/rabbitmq-alert/', ['config.ini.example'])]
+    data_files=[
+        ('/etc/rabbitmq-alert/', ['config.ini.example']),
+        ('/var/log/rabbitmq-alert/', [])
+    ]
 )

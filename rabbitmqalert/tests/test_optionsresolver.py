@@ -21,7 +21,8 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.ConfigParser.ConfigParser = self.ConfigParser
 
     def test_setup_options_returns_options_when_options_given_and_no_config_file(self):
-        resolver = optionsresolver.OptionsResover()
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
         options = [
             "--host", "foo-host",
             "--port", "foo-port",
@@ -83,7 +84,8 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_without_ssl_return_options_when_options_without_ssl_given_and_no_config_file(self):
-        resolver = optionsresolver.OptionsResover()
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
         options = [
             "--host", "foo-host",
             "--port", "foo-port",
@@ -141,7 +143,8 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
-        resolver = optionsresolver.OptionsResover()
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
         options = ["--config", "foo.ini"]
 
         optionsresolver.os.path.isfile = mock.MagicMock(return_value=False)
@@ -164,7 +167,10 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
-        options_result = optionsresolver.OptionsResover.setup_options()
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+        options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
@@ -206,7 +212,10 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
-        options_result = optionsresolver.OptionsResover.setup_options()
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+        options_result = resolver.setup_options()
 
         self.assertEquals(["foo-email-to-new"], options_result["email_to"])
 
@@ -222,7 +231,10 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
-        options_result = optionsresolver.OptionsResover.setup_options()
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+        options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
@@ -262,7 +274,10 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
         optionsresolver.optparse.sys.argv[1:] = options
-        options_result = optionsresolver.OptionsResover.setup_options()
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+        options_result = resolver.setup_options()
 
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
@@ -297,16 +312,19 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
-    def test_setup_options_reads_default_config_file_when_exists_when_no_explicit_config_file_given(self):
+    def test_setup_options_reads_global_config_file_when_exists_when_no_explicit_config_file_given(self):
         optionsresolver.os.path.isfile = mock.MagicMock()
         optionsresolver.os.path.isfile.side_effect = [True, False]
 
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
 
-        optionsresolver.OptionsResover.setup_options()
-        optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with(optionsresolver.DEFAULT_CONFIG_FILE_PATH)
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
 
-    def test_setup_options_does_not_read_default_config_file_when_explicit_config_file_given(self):
+        resolver.setup_options()
+        optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with(optionsresolver.CONFIG_FILE_PATH)
+
+    def test_setup_options_does_not_read_global_config_file_when_explicit_config_file_given(self):
         options = ["--config", "foo.ini"]
 
         optionsresolver.os.path.isfile = mock.MagicMock()
@@ -315,8 +333,56 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
         optionsresolver.optparse.sys.argv[1:] = options
 
-        optionsresolver.OptionsResover.setup_options()
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+
+        resolver.setup_options()
         optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with("foo.ini")
+
+    def test_setup_options_logs_info_when_using_global_config_file(self):
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [True, False]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+
+        resolver.setup_options()
+        logger.info.assert_called_once()
+
+    def test_setup_options_logs_info_when_explicit_config_file_given(self):
+        options = ["--config", "foo.ini"]
+
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
+        optionsresolver.optparse.sys.argv[1:] = options
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+
+        resolver.setup_options()
+        logger.info.assert_called_once()
+
+    def test_setup_options_logs_info_when_explicit_config_file_given_but_not_found(self):
+        options = ["--config", "foo.ini"]
+
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, False]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock()
+        optionsresolver.optparse.sys.argv[1:] = options
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResover(logger)
+
+        with self.assertRaises(SystemExit) as context_manager:
+            resolver.setup_options()
+
+        self.assertEqual(context_manager.exception.code, 1)
+        logger.error.assert_called_once()
 
     @staticmethod
     def construct_config_file_options_with_generic_conditions():
