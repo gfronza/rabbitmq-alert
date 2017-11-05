@@ -339,6 +339,49 @@ class OptionsResolverTestCase(unittest.TestCase):
         resolver.setup_options()
         optionsresolver.ConfigParser.ConfigParser().read.assert_called_once_with("foo.ini")
 
+    def test_setup_options_sets_empty_options_when_section_not_found_in_config_file(self):
+        config_file_options = self.construct_config_file_options_with_queue_specific_conditions()
+        del config_file_options["Email"]
+        del config_file_options["Slack"]
+        del config_file_options["Telegram"]
+        parser = ConfigParser.ConfigParser()
+        parser._sections = config_file_options
+
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, True]
+
+        optionsresolver.ConfigParser.ConfigParser = mock.MagicMock(return_value=parser)
+
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResolver(logger)
+        options_result = resolver.setup_options()
+
+        self.assertEquals("foo-host", options_result["host"])
+        self.assertEquals("foo-port", options_result["port"])
+        self.assertEquals("foo-username", options_result["username"])
+        self.assertEquals("foo-password", options_result["password"])
+        self.assertEquals("foo-vhost", options_result["vhost"])
+        self.assertEquals(["foo-queue"], options_result["queues"])
+        self.assertEquals(10, options_result["check_rate"])
+        self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
+        self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
+        self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(50, options_result["conditions"]["foo-queue"]["consumers_connected"])
+        self.assertEquals(51, options_result["conditions"]["foo-queue"]["open_connections"])
+        self.assertEquals(60, options_result["conditions"]["foo-queue"]["nodes_running"])
+        self.assertEquals(70, options_result["conditions"]["foo-queue"]["node_memory_used"])
+        self.assertIsNone(options_result["email_to"])
+        self.assertIsNone(options_result["email_from"])
+        self.assertIsNone(options_result["email_subject"])
+        self.assertIsNone(options_result["email_server"])
+        self.assertIsNone(options_result["email_password"])
+        self.assertFalse(options_result["email_ssl"])
+        self.assertIsNone(options_result["slack_url"])
+        self.assertIsNone(options_result["slack_channel"])
+        self.assertIsNone(options_result["slack_username"])
+        self.assertIsNone(options_result["telegram_bot_id"])
+        self.assertIsNone(options_result["telegram_channel"])
+
     def test_setup_options_logs_info_when_using_global_config_file(self):
         optionsresolver.os.path.isfile = mock.MagicMock()
         optionsresolver.os.path.isfile.side_effect = [True, False]

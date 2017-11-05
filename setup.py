@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # remember to push a new tag after changing this!
-VERSION = "1.2.1"
+VERSION = "1.2.2"
 
 setup(
     name="rabbitmq-alert",

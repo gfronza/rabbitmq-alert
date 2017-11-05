@@ -69,17 +69,17 @@ class OptionsResolver:
         options["queues"] = cli_arguments.queues or config_file_options.get("Server", "queues")
         options["queues"] = options["queues"].split(",")
 
-        options["email_to"] = cli_arguments.email_to or config_file_options.get("Email", "to")
-        options["email_to"] = options["email_to"].split(",")
-        options["email_from"] = cli_arguments.email_from or config_file_options.get("Email", "from")
-        options["email_subject"] = cli_arguments.email_subject or config_file_options.get("Email", "subject")
-        options["email_server"] = cli_arguments.email_server or config_file_options.get("Email", "host")
-        options["email_password"] = cli_arguments.email_password or config_file_options.get("Email", "password")
-        options["slack_url"] = cli_arguments.slack_url or config_file_options.get("Slack", "url")
-        options["slack_channel"] = cli_arguments.slack_channel or config_file_options.get("Slack", "channel")
-        options["slack_username"] = cli_arguments.slack_username or config_file_options.get("Slack", "username")
-        options["telegram_bot_id"] = cli_arguments.telegram_bot_id or config_file_options.get("Telegram", "bot_id")
-        options["telegram_channel"] = cli_arguments.telegram_channel or config_file_options.get("Telegram", "channel")
+        options["email_to"] = cli_arguments.email_to or (config_file_options.get("Email", "to") if config_file_options.has_section("Email") else None)
+        options["email_from"] = cli_arguments.email_from or (config_file_options.get("Email", "from") if config_file_options.has_section("Email") else None)
+        options["email_subject"] = cli_arguments.email_subject or (config_file_options.get("Email", "subject") if config_file_options.has_section("Email") else None)
+        options["email_server"] = cli_arguments.email_server or (config_file_options.get("Email", "host") if config_file_options.has_section("Email") else None)
+        options["email_password"] = cli_arguments.email_password or (config_file_options.get("Email", "password") if config_file_options.has_section("Email") else None)
+        options["slack_url"] = cli_arguments.slack_url or (config_file_options.get("Slack", "url") if config_file_options.has_section("Slack") else None)
+        options["slack_channel"] = cli_arguments.slack_channel or (config_file_options.get("Slack", "channel") if config_file_options.has_section("Slack") else None)
+        options["slack_username"] = cli_arguments.slack_username or (config_file_options.get("Slack", "username") if config_file_options.has_section("Slack") else None)
+        options["telegram_bot_id"] = cli_arguments.telegram_bot_id or (config_file_options.get("Telegram", "bot_id") if config_file_options.has_section("Telegram") else None)
+        options["telegram_channel"] = cli_arguments.telegram_channel or (config_file_options.get("Telegram", "channel") if config_file_options.has_section("Telegram") else None)
+        options["email_to"] = options["email_to"].split(",") if not options["email_to"] is None else None
 
         if config_file_options.has_section("Email"):
             options["email_ssl"] = config_file_options.getboolean("Email", "ssl")
