@@ -1,0 +1,10 @@
+[Unit]
+Description=Send notifications when conditions are met on RabbitMQ
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/rabbitmq-alert
+
+[Install]
+WantedBy=multi-user.target

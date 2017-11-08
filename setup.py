@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # remember to push a new tag after changing this!
-VERSION = "1.2.3"
+VERSION = "1.2.4"
 
 setup(
     name="rabbitmq-alert",
@@ -24,6 +24,7 @@ setup(
     },
     data_files=[
         ('/etc/rabbitmq-alert/', ['config.ini.example']),
-        ('/var/log/rabbitmq-alert/', [])
+        ('/var/log/rabbitmq-alert/', []),
+        ('/etc/systemd/system/', ['rabbitmq-alert.service'])
     ]
 )

@@ -86,6 +86,18 @@ Then execute ``rabbitmq-alert`` with the configuration file option:
 
     sudo rabbitmq-alert -c my_config.ini
 
+Execute as a daemon
+-------------------
+
+| A ``systemd`` script is created upon installation with ``PIP``.
+| Use the following commands to reload the ``systemd`` configuration
+| and start ``rabbitmq-alert`` as a daemon.
+
+::
+
+    sudo systemctl daemon-reload
+    sudo systemctl start rabbitmq-alert
+
 Different options per queue
 ---------------------------
 | Except conditions for all queues, you can also define queue specific conditions
