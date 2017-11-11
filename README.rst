@@ -239,3 +239,4 @@ Now, run ``rabbitmq-alert`` using the same network:
 
     docker run -d --name rabbitmq-alert --net rabbitmq-alert \
     -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
+
