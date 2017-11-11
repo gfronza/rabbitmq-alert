@@ -98,6 +98,25 @@ Execute as a daemon
     sudo systemctl daemon-reload
     sudo systemctl start rabbitmq-alert
 
+To have ``rabbitmq-alert`` always started on boot:
+
+::
+
+    sudo systemctl enable rabbitmq-alert
+
+In case your system still uses ``init.d``, an ``init.d`` script has been created
+in ``/etc/init.d`` upon ``PIP`` installation. To start ``rabbitmq-alert`` as a daemon:
+
+::
+
+    sudo /etc/init.d/rabbitmq-alert start
+
+To have ``rabbitmq-alert`` always started on boot:
+
+::
+
+    sudo update-rc.d rabbitmq-alert defaults
+
 Different options per queue
 ---------------------------
 | Except conditions for all queues, you can also define queue specific conditions
@@ -137,7 +156,8 @@ Execute in a container
 
 ::
 
-    docker run -d --name rabbitmq-alert -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
+    docker run -d --name rabbitmq-alert -v config.ini:/etc/rabbitmq-alert/config.ini \
+    mylkoh/rabbitmq-alert:latest
 
 For the configuration file, advise the ``config.ini.example`` that exists in the project's repository.
 
@@ -207,7 +227,7 @@ Run ``rabbitmq`` into a container:
     docker run -d --name some-rabbit --net rabbitmq-alert -p 8080:15672 rabbitmq:3-management
 
 | You can then go to http://localhost:8080 in a browser to use the management plugin.
-| The username and password are both ``guest``. Create a fake SMTP server:
+The username and password are both ``guest``. Create a fake SMTP server:
 
 ::
 
@@ -217,4 +237,5 @@ Now, run ``rabbitmq-alert`` using the same network:
 
 ::
 
-    docker run -d --name rabbitmq-alert --net rabbitmq-alert -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
+    docker run -d --name rabbitmq-alert --net rabbitmq-alert \
+    -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
