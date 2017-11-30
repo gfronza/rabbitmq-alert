@@ -120,11 +120,8 @@ class OptionsResolver:
                     queue_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint(queue_conditions_section_name, "unack_queue_size")
                     queue_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint(queue_conditions_section_name, "total_queue_size")
                     queue_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint(queue_conditions_section_name, "consumers_connected")
-                    queue_conditions["open_connections"] = cli_arguments.open_connections or config_file_options.getint(queue_conditions_section_name, "open_connections")
-                    queue_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint(queue_conditions_section_name, "nodes_running")
-                    queue_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint(queue_conditions_section_name, "node_memory_used")
                     conditions[queue] = queue_conditions
                 except:
                     conditions[queue] = default_conditions
 
-        return {"conditions": conditions}
+        return {"conditions": conditions, "default_conditions": default_conditions}
