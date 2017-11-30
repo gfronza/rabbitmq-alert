@@ -64,9 +64,9 @@ class RabbitMQAlert:
 
         nodes_running = len(data)
 
-        queue_conditions = options["default_conditions"]
-        nodes_run = queue_conditions.get("nodes_running")
-        node_memory = queue_conditions.get("node_memory_used")
+        conditions = options["default_conditions"]
+        nodes_run = conditions.get("nodes_running")
+        node_memory = conditions.get("node_memory_used")
 
         if nodes_run is not None and nodes_running < nodes_run:
             self.send_notification(options, "nodes_running < %s" % str(nodes_run))
