@@ -32,16 +32,16 @@ class RabbitMQAlert:
         consumers_connected_min = queue_conditions.get("consumers_connected")
 
         if ready_size is not None and messages_ready > ready_size:
-            self.send_notification(options, "%s: messages_ready > %s" % (queue, str(ready_size)))
+            self.send_notification(options, "%s: messages_ready = %d > %d" % (queue, messages_ready, ready_size))
 
         if unack_size is not None and messages_unacknowledged > unack_size:
-            self.send_notification(options, "%s: messages_unacknowledged > %s" % (queue, str(unack_size)))
+            self.send_notification(options, "%s: messages_unacknowledged = %d > %d" % (queue, messages_unacknowledged, unack_size))
 
         if total_size is not None and messages > total_size:
-            self.send_notification(options, "%s: messages > %s" % (queue, str(total_size)))
+            self.send_notification(options, "%s: messages = %d > %d" % (queue, messages, total_size))
 
         if consumers_connected_min is not None and consumers < consumers_connected_min:
-            self.send_notification(options, "%s: consumers_connected < %s" % (queue, str(consumers_connected_min)))
+            self.send_notification(options, "%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
 
     def check_connection_conditions(self, options):
         url = "http://%s:%s/api/connections" % (options["host"], options["port"])
@@ -54,7 +54,7 @@ class RabbitMQAlert:
         open_connections_min = options["default_conditions"].get("open_connections")
 
         if open_connections is not None and open_connections < open_connections_min:
-            self.send_notification(options, "open_connections < %s" % str(open_connections_min))
+            self.send_notification(options, "open_connections = %d < %d" % (open_connections, open_connections_min))
 
     def check_node_conditions(self, options):
         url = "http://%s:%s/api/nodes" % (options["host"], options["port"])
@@ -69,11 +69,11 @@ class RabbitMQAlert:
         node_memory = conditions.get("node_memory_used")
 
         if nodes_run is not None and nodes_running < nodes_run:
-            self.send_notification(options, "nodes_running < %s" % str(nodes_run))
+            self.send_notification(options, "nodes_running = %d < %d" % (nodes_running, nodes_run))
 
         for node in data:
             if node_memory is not None and node.get("mem_used") > (node_memory * 1000000):
-                self.send_notification(options, "Node %s - node_memory_used > %s MBs" % (node.get("name"), str(node_memory)))
+                self.send_notification(options, "Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
 
     def send_request(self, url, options):
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
