@@ -92,36 +92,32 @@ class OptionsResolver:
 
         return options
 
+    @staticmethod 
+    def construct_int_option(cli_arguments, config_file_options, conditions, section_key, key, default_conditions=None):
+        try:
+            conditions[key] = getattr(cli_arguments, key) or config_file_options.getint(section_key, key)
+        except:
+            if default_conditions is not None and key in default_conditions:
+                conditions[key] = default_conditions[key]
+
     @staticmethod
     def construct_conditions(options, cli_arguments, config_file_options):
         conditions = dict()
 
         # get the generic condition values from the "[Conditions]" section
         default_conditions = dict()
-        try:
-            default_conditions["ready_queue_size"] = cli_arguments.ready_queue_size or config_file_options.getint("Conditions", "ready_queue_size")
-            default_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint("Conditions", "unack_queue_size")
-            default_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint("Conditions", "total_queue_size")
-            default_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint("Conditions", "consumers_connected")
-            default_conditions["open_connections"] = cli_arguments.open_connections or config_file_options.getint("Conditions", "open_connections")
-            default_conditions["nodes_running"] = cli_arguments.nodes_running or config_file_options.getint("Conditions", "nodes_running")
-            default_conditions["node_memory_used"] = cli_arguments.node_memory_used or config_file_options.getint("Conditions", "node_memory_used")
-        except:
-            pass
+        for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "consumers_connected",
+                    "queue_consumers_connected", "open_connections", "nodes_running", "node_memory_used"):
+            OptionsResolver.construct_int_option(cli_arguments, config_file_options, default_conditions, "Conditions", key)
 
         # check if queue specific condition sections exist, if not use the generic conditions
         if "queues" in options:
             for queue in options["queues"]:
                 queue_conditions_section_name = "Conditions:" + queue
+                queue_conditions = dict()
+                conditions[queue] = queue_conditions
 
-                try:
-                    queue_conditions = dict()
-                    queue_conditions["ready_queue_size"] = cli_arguments.ready_queue_size or config_file_options.getint(queue_conditions_section_name, "ready_queue_size")
-                    queue_conditions["unack_queue_size"] = cli_arguments.unack_queue_size or config_file_options.getint(queue_conditions_section_name, "unack_queue_size")
-                    queue_conditions["total_queue_size"] = cli_arguments.total_queue_size or config_file_options.getint(queue_conditions_section_name, "total_queue_size")
-                    queue_conditions["consumers_connected"] = cli_arguments.consumers_connected or config_file_options.getint(queue_conditions_section_name, "consumers_connected")
-                    conditions[queue] = queue_conditions
-                except:
-                    conditions[queue] = default_conditions
+                for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "queue_consumers_connected"):
+                    OptionsResolver.construct_int_option(cli_arguments, config_file_options, queue_conditions, queue_conditions_section_name, key, default_conditions)
 
         return {"conditions": conditions, "default_conditions": default_conditions}

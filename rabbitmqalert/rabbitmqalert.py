@@ -29,7 +29,7 @@ class RabbitMQAlert:
         ready_size = queue_conditions.get("ready_queue_size")
         unack_size = queue_conditions.get("unack_queue_size")
         total_size = queue_conditions.get("total_queue_size")
-        consumers_connected_min = queue_conditions.get("consumers_connected")
+        consumers_connected_min = queue_conditions.get("queue_consumers_connected")
 
         if ready_size is not None and messages_ready > ready_size:
             self.send_notification(options, "%s: messages_ready = %d > %d" % (queue, messages_ready, ready_size))
@@ -42,6 +42,18 @@ class RabbitMQAlert:
 
         if consumers_connected_min is not None and consumers < consumers_connected_min:
             self.send_notification(options, "%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
+
+    def check_consumer_conditions(self, options):		
+        url = "http://%s:%s/api/consumers" % (options["host"], options["port"])
+        data = self.send_request(url, options)
+        if data is None:
+            return
+
+        consumers_connected = len(data)
+        consumers_connected_min = options["default_conditions"].get("consumers_connected")
+
+        if consumers_connected is not None and consumers_connected < consumers_connected_min:
+            self.send_notification(options, "consumers_connected = %d < %d" % (consumers_connected, consumers_connected_min))
 
     def check_connection_conditions(self, options):
         url = "http://%s:%s/api/connections" % (options["host"], options["port"])
@@ -153,7 +165,7 @@ def main():
             if "ready_queue_size" in queue_conditions \
                     or "unack_queue_size" in queue_conditions \
                     or "total_queue_size" in queue_conditions \
-                    or "consumers_connected" in queue_conditions:
+                    or "queue_consumers_connected" in queue_conditions:
                 rabbitmq_alert.check_queue_conditions(options)
 
         # common checks for all queues
@@ -162,6 +174,8 @@ def main():
             rabbitmq_alert.check_node_conditions(options)
         if "open_connections" in default_conditions:
             rabbitmq_alert.check_connection_conditions(options)
+        if "consumers_connected" in default_conditions:
+            rabbitmq_alert.check_consumer_conditions(options)
 
         time.sleep(options["check_rate"])
 
