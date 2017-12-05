@@ -171,8 +171,6 @@ class OptionsResolverTestCase(unittest.TestCase):
         logger = mock.MagicMock()
         resolver = optionsresolver.OptionsResolver(logger)
         options_result = resolver.setup_options()
-        print options_result
-        print config_file_options
 
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
@@ -361,7 +359,6 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-vhost", options_result["vhost"])
         self.assertEquals(["foo-queue"], options_result["queues"])
         self.assertEquals(10, options_result["check_rate"])
-        print options_result
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
