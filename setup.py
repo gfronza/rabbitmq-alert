@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os import path
 
 # remember to push a new tag after changing this!
-VERSION = "1.3.2"
+VERSION = "1.4.0"
 
 DIST_CONFIG_PATH = "rabbitmqalert/config"
 
@@ -25,6 +25,7 @@ def generate_data_files():
         DATA_FILES.append(("/etc/init.d/", [DIST_CONFIG_PATH + "/service/rabbitmq-alert"]))
 
     return DATA_FILES
+
 
 setup(
     name="rabbitmq-alert",
