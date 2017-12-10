@@ -33,7 +33,7 @@ setup(
     long_description=generate_readme(),
     packages=find_packages(exclude=["*tests*"]),
     description="Send notifications when predefined conditions are met",
-    author="Germano Fronza, Kostas Milonas, velika12",
+    author="Germano Fronza, Kostas Milonas, velika12, Robert Kopaczewski",
     author_email="germano.inf@gmail.com",
     url="https://github.com/gfronza/rabbitmq-alert",
     download_url="https://github.com/gfronza/rabbitmq-alert/tarball/"+VERSION,
