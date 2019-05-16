@@ -1,6 +1,11 @@
+.idea/
+.project
+.pydevproject
+.settings/
+
 **/*.pyc
 **/*.pyo
-.idea/
 build/
 dist/
 rabbitmq_alert.egg-info/
+
