@@ -27,6 +27,7 @@ class OptionsResolver:
         arguments.add_option("--unacknowledged-queue-size", dest="unack_queue_size", help="Size of the Unacknowledged messages on the queue to alert as warning", type="int")
         arguments.add_option("--total-queue-size", dest="total_queue_size", help="Size of the Total messages on the queue to alert as warning", type="int")
         arguments.add_option("--consumers-connected", dest="consumers_connected", help="The number of consumers that should be connected", type="int")
+        arguments.add_option("--queue-consumers-connected", dest="queue_consumers_connected", help="The number of consumers that should be connected to the queue", type="int")
         arguments.add_option("--open-connections", dest="open_connections", help="The number of open connections", type="int")
         arguments.add_option("--nodes-running", dest="nodes_running", help="The number of nodes running", type="int")
         arguments.add_option("--node-memory-used", dest="node_memory_used", help="Memory used by each node in MBs", type="int")
