@@ -9,6 +9,7 @@ CONFIG_FILE_PATH = "/etc/rabbitmq-alert/config.ini"
 
 
 class OptionsResolver:
+
     def __init__(self, logger):
         self.log = logger
 
@@ -93,23 +94,23 @@ class OptionsResolver:
 
         return options
 
-    @staticmethod 
-    def construct_int_option(cli_arguments, config_file_options, conditions, section_key, key, default_conditions=None):
+    @staticmethod
+    def construct_int_option(cli_arguments, config_file_options, conditions, section_key, key, generic_conditions=None):
         try:
             conditions[key] = getattr(cli_arguments, key) or config_file_options.getint(section_key, key)
         except:
-            if default_conditions is not None and key in default_conditions:
-                conditions[key] = default_conditions[key]
+            if generic_conditions is not None and key in generic_conditions:
+                conditions[key] = generic_conditions[key]
 
     @staticmethod
     def construct_conditions(options, cli_arguments, config_file_options):
         conditions = dict()
 
         # get the generic condition values from the "[Conditions]" section
-        default_conditions = dict()
-        for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "consumers_connected",
-                    "queue_consumers_connected", "open_connections", "nodes_running", "node_memory_used"):
-            OptionsResolver.construct_int_option(cli_arguments, config_file_options, default_conditions, "Conditions", key)
+        generic_conditions = dict()
+        for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "queue_consumers_connected",
+                    "consumers_connected", "open_connections", "nodes_running", "node_memory_used"):
+            OptionsResolver.construct_int_option(cli_arguments, config_file_options, generic_conditions, "Conditions", key)
 
         # check if queue specific condition sections exist, if not use the generic conditions
         if "queues" in options:
@@ -119,6 +120,6 @@ class OptionsResolver:
                 conditions[queue] = queue_conditions
 
                 for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "queue_consumers_connected"):
-                    OptionsResolver.construct_int_option(cli_arguments, config_file_options, queue_conditions, queue_conditions_section_name, key, default_conditions)
+                    OptionsResolver.construct_int_option(cli_arguments, config_file_options, queue_conditions, queue_conditions_section_name, key, generic_conditions)
 
-        return {"conditions": conditions, "default_conditions": default_conditions}
+        return {"conditions": conditions, "generic_conditions": generic_conditions}

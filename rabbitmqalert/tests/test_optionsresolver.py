@@ -8,6 +8,7 @@ import ConfigParser
 
 
 class OptionsResolverTestCase(unittest.TestCase):
+
     def setUp(self):
         optionsresolver.os_real = optionsresolver.os
         optionsresolver.optparse.sys.argv[1:] = []
@@ -67,10 +68,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
@@ -126,10 +127,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
@@ -182,10 +183,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
@@ -246,10 +247,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
@@ -292,10 +293,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(30, options_result["conditions"]["bar-queue"]["ready_queue_size"])
         self.assertEquals(40, options_result["conditions"]["bar-queue"]["unack_queue_size"])
         self.assertEquals(50, options_result["conditions"]["bar-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertEquals(["foo-email-to"], options_result["email_to"])
         self.assertEquals("foo-email-from", options_result["email_from"])
         self.assertEquals("foo-email-subject", options_result["email_subject"])
@@ -362,10 +363,10 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
-        self.assertEquals(50, options_result["default_conditions"]["consumers_connected"])
-        self.assertEquals(51, options_result["default_conditions"]["open_connections"])
-        self.assertEquals(60, options_result["default_conditions"]["nodes_running"])
-        self.assertEquals(70, options_result["default_conditions"]["node_memory_used"])
+        self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
+        self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
+        self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
+        self.assertEquals(70, options_result["generic_conditions"]["node_memory_used"])
         self.assertIsNone(options_result["email_to"])
         self.assertIsNone(options_result["email_from"])
         self.assertIsNone(options_result["email_subject"])
@@ -551,6 +552,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "channel": "foo-telegram-channel"
             }
         }
+
 
 if __name__ == "__main__":
     unittest.main()

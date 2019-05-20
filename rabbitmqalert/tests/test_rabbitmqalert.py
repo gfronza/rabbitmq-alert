@@ -8,6 +8,7 @@ from . import optionsresolver
 
 
 class RabbitMQAlertTestCase(unittest.TestCase):
+
     def setUp(self):
         rabbitmqalert.urllib2_real = rabbitmqalert.urllib2
         optionsresolver.OptionsResolver.setup_options_real = optionsresolver.OptionsResolver.setup_options
@@ -378,7 +379,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             "vhost": "foo",
             "queue": "foo",
             "queues": ["foo"],
-            "default_conditions": {
+            "generic_conditions": {
                 "ready_queue_size": 0,
                 "unack_queue_size": 0,
                 "total_queue_size": 0,
@@ -441,6 +442,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             { "mem_used": 500000 },
             { "mem_used": 500000 }
         ]
+
 
 if __name__ == "__main__":
     unittest.main()
