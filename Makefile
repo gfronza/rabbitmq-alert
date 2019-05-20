@@ -10,7 +10,7 @@ test-install:
 	sudo python2 setup.py install
 
 clean:
-	rm -rf dist/ rabbitmq_alert.egg-info/
+	rm -rf build/ dist/ rabbitmq_alert.egg-info/
 
 dist: clean
 	python2 setup.py sdist
