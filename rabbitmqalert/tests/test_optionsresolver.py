@@ -35,6 +35,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--ready-queue-size", "20",
             "--unacknowledged-queue-size", "30",
             "--total-queue-size", "40",
+            "--queue-consumers-connected", "52",
             "--consumers-connected", "50",
             "--open-connections", "51",
             "--nodes-running", "60",
@@ -68,6 +69,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -84,7 +86,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
-    def test_setup_options_without_ssl_return_options_when_options_without_ssl_given_and_no_config_file(self):
+    def test_setup_options_returns_default_value_of_missing_option(self):
         logger = mock.MagicMock()
         resolver = optionsresolver.OptionsResolver(logger)
         options = [
@@ -98,6 +100,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--ready-queue-size", "20",
             "--unacknowledged-queue-size", "30",
             "--total-queue-size", "40",
+            "--queue-consumers-connected", "52",
             "--consumers-connected", "50",
             "--open-connections", "51",
             "--nodes-running", "60",
@@ -127,6 +130,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -183,6 +187,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -247,6 +252,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -290,9 +296,11 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(30, options_result["conditions"]["bar-queue"]["ready_queue_size"])
         self.assertEquals(40, options_result["conditions"]["bar-queue"]["unack_queue_size"])
         self.assertEquals(50, options_result["conditions"]["bar-queue"]["total_queue_size"])
+        self.assertEquals(62, options_result["conditions"]["bar-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -363,6 +371,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
         self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
         self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
         self.assertEquals(50, options_result["generic_conditions"]["consumers_connected"])
         self.assertEquals(51, options_result["generic_conditions"]["open_connections"])
         self.assertEquals(60, options_result["generic_conditions"]["nodes_running"])
@@ -440,6 +449,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "ready_queue_size": "20",
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
+                "queue_consumers_connected": "52",
                 "consumers_connected": "50",
                 "open_connections": "51",
                 "nodes_running": "60",
@@ -486,6 +496,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "ready_queue_size": "20",
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
+                "queue_consumers_connected": "52",
             },
             "Email": {
                 "to": "foo-email-to",
@@ -528,11 +539,13 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "ready_queue_size": "20",
                 "unack_queue_size": "30",
                 "total_queue_size": "40",
+                "queue_consumers_connected": "52",
             },
             "Conditions:bar-queue": {
                 "ready_queue_size": "30",
                 "unack_queue_size": "40",
                 "total_queue_size": "50",
+                "queue_consumers_connected": "62",
             },
             "Email": {
                 "to": "foo-email-to",

@@ -383,6 +383,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
                 "ready_queue_size": 0,
                 "unack_queue_size": 0,
                 "total_queue_size": 0,
+                "queue_consumers_connected": 0,
                 "consumers_connected": 1,
                 "open_connections": 1,
                 "nodes_running": 1,
@@ -393,6 +394,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
                     "ready_queue_size": 0,
                     "unack_queue_size": 0,
                     "total_queue_size": 0,
+                    "queue_consumers_connected": 0,
                     "consumers_connected": 1,
                     "open_connections": 1,
                     "nodes_running": 1,
@@ -419,7 +421,8 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         return {
             "messages_ready": 0,
             "messages_unacknowledged": 0,
-            "messages": 0
+            "messages": 0,
+            "consumers": 0
         }
 
     @staticmethod
