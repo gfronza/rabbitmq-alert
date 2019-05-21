@@ -371,6 +371,254 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         logger.info.assert_not_called()
 
+    def test_main_runs_check_queue_conditions_when_ready_queue_size_in_queue_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": ["foo"],
+            "generic_conditions": {},
+            "check_rate": 1,
+            "conditions": {
+                "foo": {
+                    "ready_queue_size": 1
+                }
+            }
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_queue_conditions_when_unack_queue_size_in_queue_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": ["foo"],
+            "generic_conditions": {},
+            "check_rate": 1,
+            "conditions": {
+                "foo": {
+                    "unack_queue_size": 1
+                }
+            }
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_queue_conditions_when_total_queue_size_in_queue_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": ["foo"],
+            "generic_conditions": {},
+            "check_rate": 1,
+            "conditions": {
+                "foo": {
+                    "total_queue_size": 1
+                }
+            }
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_queue_conditions_when_queue_consumers_connected_in_queue_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": ["foo"],
+            "generic_conditions": {},
+            "check_rate": 1,
+            "conditions": {
+                "foo": {
+                    "queue_consumers_connected": 1
+                }
+            }
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_node_conditions_when_nodes_running_in_generic_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": [],
+            "generic_conditions": {
+                "nodes_running": 1
+            },
+            "check_rate": 1,
+            "conditions": {}
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_not_called()
+        rmqa.check_node_conditions.assert_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_node_conditions_when_node_memory_used_in_generic_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": [],
+            "generic_conditions": {
+                "node_memory_used": 1
+            },
+            "check_rate": 1,
+            "conditions": {}
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_not_called()
+        rmqa.check_node_conditions.assert_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_connection_conditions_when_open_connections_in_generic_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": [],
+            "generic_conditions": {
+                "open_connections": 1
+            },
+            "check_rate": 1,
+            "conditions": {}
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_not_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_called()
+        rmqa.check_consumer_conditions.assert_not_called()
+
+    def test_main_runs_check_consumer_conditions_when_consumers_connected_in_generic_conditions(self):
+        rabbitmqalert.logger = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_queue_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_node_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_connection_conditions = mock.MagicMock()
+        rabbitmqalert.RabbitMQAlert.check_consumer_conditions = mock.MagicMock()
+        # throw exception to escape the "while True" loop
+        rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
+        rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger)
+
+        options = {
+            "queues": [],
+            "generic_conditions": {
+                "consumers_connected": 1
+            },
+            "check_rate": 1,
+            "conditions": {}
+        }
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        try:
+            rabbitmqalert.main()
+        except ValueError:
+            pass
+
+        rmqa.check_queue_conditions.assert_not_called()
+        rmqa.check_node_conditions.assert_not_called()
+        rmqa.check_connection_conditions.assert_not_called()
+        rmqa.check_consumer_conditions.assert_called()
+
     @staticmethod
     def construct_options():
         options = {

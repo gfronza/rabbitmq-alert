@@ -171,7 +171,7 @@ def main():
 
         # common checks for all queues
         generic_conditions = options["generic_conditions"]
-        if "nodes_running" in generic_conditions:
+        if "nodes_running" in generic_conditions or "node_memory_used" in generic_conditions:
             rabbitmq_alert.check_node_conditions(options)
         if "open_connections" in generic_conditions:
             rabbitmq_alert.check_connection_conditions(options)
