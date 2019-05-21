@@ -150,7 +150,7 @@ class RabbitMQAlert:
 
 
 def main():
-    log = logger.Logger()
+    log = logger.Logger().get_logger()
     log.info("Starting application...")
 
     rabbitmq_alert = RabbitMQAlert(log)
