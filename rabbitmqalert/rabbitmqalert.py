@@ -16,7 +16,7 @@ class RabbitMQAlert:
 
     def check_queue_conditions(self, options):
         queue = options["queue"]
-        url = "http://%s:%s/api/queues/%s/%s" % (options["host"], options["port"], options["vhost"], options["queue"])
+        url = "%s://%s:%s/api/queues/%s/%s" % (options["scheme"], options["host"], options["port"], options["vhost"], options["queue"])
         data = self.send_request(url, options)
         if data is None:
             return
@@ -45,7 +45,7 @@ class RabbitMQAlert:
             self.send_notification(options, "%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
 
     def check_consumer_conditions(self, options):
-        url = "http://%s:%s/api/consumers" % (options["host"], options["port"])
+        url = "%s://%s:%s/api/consumers" % (options["scheme"], options["host"], options["port"])
         data = self.send_request(url, options)
         if data is None:
             return
@@ -57,7 +57,7 @@ class RabbitMQAlert:
             self.send_notification(options, "consumers_connected = %d < %d" % (consumers_connected, consumers_connected_min))
 
     def check_connection_conditions(self, options):
-        url = "http://%s:%s/api/connections" % (options["host"], options["port"])
+        url = "%s://%s:%s/api/connections" % (options["scheme"], options["host"], options["port"])
         data = self.send_request(url, options)
         if data is None:
             return
@@ -70,7 +70,7 @@ class RabbitMQAlert:
             self.send_notification(options, "open_connections = %d < %d" % (open_connections, open_connections_min))
 
     def check_node_conditions(self, options):
-        url = "http://%s:%s/api/nodes" % (options["host"], options["port"])
+        url = "%s://%s:%s/api/nodes" % (options["scheme"], options["host"], options["port"])
         data = self.send_request(url, options)
         if data is None:
             return

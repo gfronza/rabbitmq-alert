@@ -16,6 +16,7 @@ class OptionsResolver:
     def setup_options(self):
         arguments = optparse.OptionParser()
         arguments.add_option("-c", "--config-file", dest="config_file", help="Path of the configuration file", type="string")
+        arguments.add_option("--scheme", dest="scheme", help="RabbitMQ API scheme", type="string")
         arguments.add_option("--host", dest="host", help="RabbitMQ API address", type="string")
         arguments.add_option("--port", dest="port", help="RabbitMQ API port", type="string")
         arguments.add_option("--username", dest="username", help="RabbitMQ API username", type="string")
@@ -62,6 +63,7 @@ class OptionsResolver:
 
             config_file_options.read(cli_arguments.config_file)
 
+        options["scheme"] = cli_arguments.scheme or (config_file_options.get("Server", "scheme") if config_file_options.has_option("Server", "scheme") else None) or "http"
         options["host"] = cli_arguments.host or config_file_options.get("Server", "host")
         options["port"] = cli_arguments.port or config_file_options.get("Server", "port")
         options["username"] = cli_arguments.username or config_file_options.get("Server", "username")

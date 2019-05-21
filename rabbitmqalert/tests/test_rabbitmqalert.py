@@ -622,6 +622,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
     @staticmethod
     def construct_options():
         options = {
+            "scheme": "http",
             "host": "foo",
             "port": 1,
             "vhost": "foo",
