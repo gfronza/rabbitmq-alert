@@ -352,6 +352,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertIsNone(options_result["email_subject"])
         self.assertIsNone(options_result["email_server"])
         self.assertIsNone(options_result["email_password"])
+        self.assertEquals(False, options_result["email_ssl"])
         self.assertIsNone(options_result["slack_url"])
         self.assertIsNone(options_result["slack_channel"])
         self.assertIsNone(options_result["slack_username"])
@@ -362,6 +363,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         config_file_options = self.construct_config_file_options_with_queue_specific_conditions()
         del config_file_options["Server"]["scheme"]
         del config_file_options["Server"]["host_alias"]
+        del config_file_options["Email"]["ssl"]
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
@@ -376,6 +378,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         self.assertEquals("http", options_result["scheme"])
         self.assertEquals(None, options_result["host_alias"])
+        self.assertEquals(False, options_result["email_ssl"])
 
     def test_setup_options_logs_info_when_using_global_config_file(self):
         optionsresolver.os.path.isfile = mock.MagicMock()
