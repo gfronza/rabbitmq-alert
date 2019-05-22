@@ -106,7 +106,7 @@ class RabbitMQAlert:
             return None
 
     def send_notification(self, options, body):
-        text = "%s - %s" % (options["host"], body)
+        text = "%s - %s" % (options["host_alias"] or options["host"], body)
 
         if "email_to" in options and options["email_to"]:
             self.log.info("Sending email notification: \"{0}\"".format(body))
@@ -121,7 +121,7 @@ class RabbitMQAlert:
 
             recipients = options["email_to"]
             # add subject as header before message text
-            subject_email = options["email_subject"] % (options["host"], options["queue"])
+            subject_email = options["email_subject"] % (options["host_alias"] or options["host"], options["queue"])
             text_email = "Subject: %s\n\n%s" % (subject_email, text)
             server.sendmail(options["email_from"], recipients, text_email)
 

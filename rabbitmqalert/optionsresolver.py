@@ -19,6 +19,7 @@ class OptionsResolver:
         arguments.add_option("--scheme", dest="scheme", help="RabbitMQ API scheme", type="string")
         arguments.add_option("--host", dest="host", help="RabbitMQ API address", type="string")
         arguments.add_option("--port", dest="port", help="RabbitMQ API port", type="string")
+        arguments.add_option("--host-alias", dest="host_alias", help="RabbitMQ API host alias (for display only)", type="string")
         arguments.add_option("--username", dest="username", help="RabbitMQ API username", type="string")
         arguments.add_option("--password", dest="password", help="RabbitMQ API password", type="string")
         arguments.add_option("--vhost", dest="vhost", help="Name of the vhost to inspect", type="string")
@@ -66,6 +67,7 @@ class OptionsResolver:
         options["scheme"] = cli_arguments.scheme or (config_file_options.get("Server", "scheme") if config_file_options.has_option("Server", "scheme") else None) or "http"
         options["host"] = cli_arguments.host or config_file_options.get("Server", "host")
         options["port"] = cli_arguments.port or config_file_options.get("Server", "port")
+        options["host_alias"] = cli_arguments.host_alias or (config_file_options.get("Server", "host_alias") if config_file_options.has_option("Server", "host_alias") else None) or None
         options["username"] = cli_arguments.username or config_file_options.get("Server", "username")
         options["password"] = cli_arguments.password or config_file_options.get("Server", "password")
         options["vhost"] = cli_arguments.vhost or config_file_options.get("Server", "vhost")

@@ -28,6 +28,7 @@ class OptionsResolverTestCase(unittest.TestCase):
             "--scheme", "foo-scheme",
             "--host", "foo-host",
             "--port", "foo-port",
+            "--host-alias", "bar-host",
             "--username", "foo-username",
             "--password", "foo-password",
             "--vhost", "foo-vhost",
@@ -62,6 +63,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
+        self.assertEquals("bar-host", options_result["host_alias"])
         self.assertEquals("foo-username", options_result["username"])
         self.assertEquals("foo-password", options_result["password"])
         self.assertEquals("foo-vhost", options_result["vhost"])
@@ -122,6 +124,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         options_result = resolver.setup_options()
 
         self.assertEquals("http", options_result["scheme"])
+        self.assertEquals(None, options_result["host_alias"])
         self.assertEquals(False, options_result["email_ssl"])
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
@@ -157,6 +160,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-scheme", options_result["scheme"])
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
+        self.assertEquals("bar-host", options_result["host_alias"])
         self.assertEquals("foo-username", options_result["username"])
         self.assertEquals("foo-password", options_result["password"])
         self.assertEquals("foo-vhost", options_result["vhost"])
@@ -223,6 +227,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-scheme", options_result["scheme"])
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
+        self.assertEquals("bar-host", options_result["host_alias"])
         self.assertEquals("foo-username", options_result["username"])
         self.assertEquals("foo-password", options_result["password"])
         self.assertEquals("foo-vhost", options_result["vhost"])
@@ -268,6 +273,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-scheme", options_result["scheme"])
         self.assertEquals("foo-host", options_result["host"])
         self.assertEquals("foo-port", options_result["port"])
+        self.assertEquals("bar-host", options_result["host_alias"])
         self.assertEquals("foo-username", options_result["username"])
         self.assertEquals("foo-password", options_result["password"])
         self.assertEquals("foo-vhost", options_result["vhost"])
@@ -355,6 +361,7 @@ class OptionsResolverTestCase(unittest.TestCase):
     def test_setup_options_sets_default_option_value_when_option_not_found_in_config_file(self):
         config_file_options = self.construct_config_file_options_with_queue_specific_conditions()
         del config_file_options["Server"]["scheme"]
+        del config_file_options["Server"]["host_alias"]
         parser = ConfigParser.ConfigParser()
         parser._sections = config_file_options
 
@@ -368,6 +375,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         options_result = resolver.setup_options()
 
         self.assertEquals("http", options_result["scheme"])
+        self.assertEquals(None, options_result["host_alias"])
 
     def test_setup_options_logs_info_when_using_global_config_file(self):
         optionsresolver.os.path.isfile = mock.MagicMock()
@@ -421,6 +429,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "scheme": "foo-scheme",
                 "host": "foo-host",
                 "port": "foo-port",
+                "host_alias": "bar-host",
                 "username": "foo-username",
                 "password": "foo-password",
                 "vhost": "foo-vhost",
@@ -463,6 +472,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "scheme": "foo-scheme",
                 "host": "foo-host",
                 "port": "foo-port",
+                "host_alias": "bar-host",
                 "username": "foo-username",
                 "password": "foo-password",
                 "vhost": "foo-vhost",
@@ -507,6 +517,7 @@ class OptionsResolverTestCase(unittest.TestCase):
                 "scheme": "foo-scheme",
                 "host": "foo-host",
                 "port": "foo-port",
+                "host_alias": "bar-host",
                 "username": "foo-username",
                 "password": "foo-password",
                 "vhost": "foo-vhost",
