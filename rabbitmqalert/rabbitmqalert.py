@@ -85,7 +85,7 @@ class RabbitMQAlert:
             self.send_notification(options, "nodes_running = %d < %d" % (nodes_running, nodes_run))
 
         for node in data:
-            if node_memory is not None and node.get("mem_used") > (node_memory * 1000000):
+            if node_memory is not None and node.get("mem_used") > (node_memory * pow(1024, 2)):
                 self.send_notification(options, "Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
 
     def send_request(self, url, options):
