@@ -5,8 +5,9 @@ import urllib2
 import json
 import time
 import smtplib
-import optionsresolver
+
 import logger
+import optionsresolver
 
 
 class RabbitMQAlert:
@@ -87,6 +88,23 @@ class RabbitMQAlert:
         for node in data:
             if node_memory is not None and node.get("mem_used") > (node_memory * pow(1024, 2)):
                 self.send_notification(options, "Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
+
+    def get_queues(self, options):
+        url = "%s://%s:%s/api/queues?page=1&page_size=300" % (options["scheme"], options["host"], options["port"])
+        data = self.send_request(url, options)
+        if data is None:
+            return []
+
+        queues = []
+        for queue in data.get("items"):
+            queues.append(queue.get("name"))
+
+        if queues:
+            self.log.info("Queues discovered: {0}".format(", ".join(queues)))
+        else:
+            self.log.error("No queues discovered.")
+
+        return queues
 
     def send_request(self, url, options):
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()

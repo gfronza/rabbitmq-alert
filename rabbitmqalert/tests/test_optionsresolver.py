@@ -12,6 +12,7 @@ class OptionsResolverTestCase(unittest.TestCase):
     def setUp(self):
         optionsresolver.os_real = optionsresolver.os
         optionsresolver.optparse.sys.argv[1:] = []
+        optionsresolver.rabbitmqalert_real = optionsresolver.rabbitmqalert
 
         # Stash the original function to reassign it later
         self.ConfigParser = optionsresolver.ConfigParser.ConfigParser
@@ -19,6 +20,7 @@ class OptionsResolverTestCase(unittest.TestCase):
     def tearDown(self):
         optionsresolver.os = optionsresolver.os_real
         optionsresolver.optparse.sys.argv[1:] = []
+        optionsresolver.rabbitmqalert = optionsresolver.rabbitmqalert_real
         optionsresolver.ConfigParser.ConfigParser = self.ConfigParser
 
     def test_setup_options_returns_options_when_options_given_and_no_config_file(self):
@@ -125,6 +127,7 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         self.assertEquals("http", options_result["scheme"])
         self.assertEquals(None, options_result["host_alias"])
+        self.assertEquals(False, options_result["queues_discovery"])
         self.assertEquals(False, options_result["email_ssl"])
 
     def test_setup_options_exits_with_error_when_config_file_not_found(self):
@@ -303,7 +306,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         self.assertEquals("foo-telegram-bot-id", options_result["telegram_bot_id"])
         self.assertEquals("foo-telegram-channel", options_result["telegram_channel"])
 
-    def test_setup_options_reads_global_config_file_when_exists_when_no_explicit_config_file_given(self):
+    def test_setup_options_reads_global_config_file_when_exists_and_no_explicit_config_file_given(self):
         optionsresolver.os.path.isfile = mock.MagicMock()
         optionsresolver.os.path.isfile.side_effect = [True, False]
 
@@ -378,7 +381,61 @@ class OptionsResolverTestCase(unittest.TestCase):
 
         self.assertEquals("http", options_result["scheme"])
         self.assertEquals(None, options_result["host_alias"])
+        self.assertEquals(False, options_result["queues_discovery"])
         self.assertEquals(False, options_result["email_ssl"])
+
+    def test_setup_options_returns_options_of_discoverd_queues(self):
+        logger = mock.MagicMock()
+        resolver = optionsresolver.OptionsResolver(logger)
+        options = [
+            "--scheme", "foo-scheme",
+            "--host", "foo-host",
+            "--port", "foo-port",
+            "--host-alias", "bar-host",
+            "--username", "foo-username",
+            "--password", "foo-password",
+            "--vhost", "foo-vhost",
+            "--queues", "foo-queue",
+            "--queues-discovery", "",
+            "--check-rate", "10",
+            "--ready-queue-size", "20",
+            "--unacknowledged-queue-size", "30",
+            "--total-queue-size", "40",
+            "--queue-consumers-connected", "52",
+            "--consumers-connected", "50",
+            "--open-connections", "51",
+            "--nodes-running", "60",
+            "--node-memory-used", "70",
+            "--email-to", "foo-email-to",
+            "--email-from", "foo-email-from",
+            "--email-subject", "foo-email-subject",
+            "--email-server", "foo-email-server",
+            "--email-password", "foo-email-password",
+            "--email-ssl", "",
+            "--slack-url", "foo-slack-url",
+            "--slack-channel", "foo-slack-channel",
+            "--slack-username", "foo-slack-username",
+            "--telegram-bot-id", "foo-telegram-bot-id",
+            "--telegram-channel", "foo-telegram-channel"
+        ]
+
+        optionsresolver.os.path.isfile = mock.MagicMock()
+        optionsresolver.os.path.isfile.side_effect = [False, False]
+
+        optionsresolver.optparse.sys.argv[1:] = options
+        optionsresolver.rabbitmqalert.RabbitMQAlert.get_queues = mock.MagicMock(return_value=["foo-queue", "bar-queue"])
+        options_result = resolver.setup_options()
+
+        self.assertEquals(True, options_result["queues_discovery"])
+        self.assertEquals(["foo-queue", "bar-queue"], options_result["queues"])
+        self.assertEquals(20, options_result["conditions"]["foo-queue"]["ready_queue_size"])
+        self.assertEquals(30, options_result["conditions"]["foo-queue"]["unack_queue_size"])
+        self.assertEquals(40, options_result["conditions"]["foo-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["foo-queue"]["queue_consumers_connected"])
+        self.assertEquals(20, options_result["conditions"]["bar-queue"]["ready_queue_size"])
+        self.assertEquals(30, options_result["conditions"]["bar-queue"]["unack_queue_size"])
+        self.assertEquals(40, options_result["conditions"]["bar-queue"]["total_queue_size"])
+        self.assertEquals(52, options_result["conditions"]["bar-queue"]["queue_consumers_connected"])
 
     def test_setup_options_logs_info_when_using_global_config_file(self):
         optionsresolver.os.path.isfile = mock.MagicMock()

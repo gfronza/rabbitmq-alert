@@ -5,6 +5,8 @@ import optparse
 import ConfigParser
 import os.path
 
+import rabbitmqalert
+
 CONFIG_FILE_PATH = "/etc/rabbitmq-alert/config.ini"
 
 
@@ -24,6 +26,7 @@ class OptionsResolver:
         arguments.add_option("--password", dest="password", help="RabbitMQ API password", type="string")
         arguments.add_option("--vhost", dest="vhost", help="Name of the vhost to inspect", type="string")
         arguments.add_option("--queues", dest="queues", help="List of comma-separated queue names to inspect", type="string")
+        arguments.add_option("--queues-discovery", dest="queues_discovery", help="Discover queues", action="store_true")
         arguments.add_option("--check-rate", dest="check_rate", help="Conditions check frequency, in seconds.", type="int")
 
         arguments.add_option("--ready-queue-size", dest="ready_queue_size", help="Size of Ready messages on the queue to alert as warning", type="int")
@@ -72,8 +75,8 @@ class OptionsResolver:
         options["password"] = cli_arguments.password or config_file_options.get("Server", "password")
         options["vhost"] = cli_arguments.vhost or config_file_options.get("Server", "vhost")
         options["check_rate"] = cli_arguments.check_rate or config_file_options.getfloat("Server", "check_rate")
-        options["queues"] = cli_arguments.queues or config_file_options.get("Server", "queues")
-        options["queues"] = options["queues"].split(",")
+        options["queues_discovery"] = cli_arguments.queues_discovery or (config_file_options.getboolean("Server", "queues_discovery") if config_file_options.has_option("Server", "queues_discovery") else None) or False
+        options["queues"] = (cli_arguments.queues or config_file_options.get("Server", "queues")).split(",") if not options["queues_discovery"] else rabbitmqalert.RabbitMQAlert(self.log).get_queues(options)
 
         options["email_to"] = cli_arguments.email_to or (config_file_options.get("Email", "to") if config_file_options.has_section("Email") else None)
         options["email_from"] = cli_arguments.email_from or (config_file_options.get("Email", "from") if config_file_options.has_section("Email") else None)
@@ -89,7 +92,7 @@ class OptionsResolver:
         options["email_to"] = options["email_to"].split(",") if not options["email_to"] is None else None
 
         # get queue specific condition values if any, else construct from the generic one
-        conditions = OptionsResolver.construct_conditions(options, cli_arguments, config_file_options)
+        conditions = self.construct_conditions(options, cli_arguments, config_file_options)
         options = dict(options.items() + conditions.items())
 
         return options
@@ -102,8 +105,7 @@ class OptionsResolver:
             if generic_conditions is not None and key in generic_conditions:
                 conditions[key] = generic_conditions[key]
 
-    @staticmethod
-    def construct_conditions(options, cli_arguments, config_file_options):
+    def construct_conditions(self, options, cli_arguments, config_file_options):
         conditions = dict()
 
         # get the generic condition values from the "[Conditions]" section
@@ -112,14 +114,12 @@ class OptionsResolver:
                     "consumers_connected", "open_connections", "nodes_running", "node_memory_used"):
             OptionsResolver.construct_int_option(cli_arguments, config_file_options, generic_conditions, "Conditions", key)
 
-        # check if queue specific condition sections exist, if not use the generic conditions
-        if "queues" in options:
-            for queue in options["queues"]:
-                queue_conditions_section_name = "Conditions:" + queue
-                queue_conditions = dict()
-                conditions[queue] = queue_conditions
+        for queue in options["queues"]:
+            queue_conditions_section_name = "Conditions:" + queue
+            queue_conditions = dict()
+            conditions[queue] = queue_conditions
 
-                for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "queue_consumers_connected"):
-                    OptionsResolver.construct_int_option(cli_arguments, config_file_options, queue_conditions, queue_conditions_section_name, key, generic_conditions)
+            for key in ("ready_queue_size", "unack_queue_size", "total_queue_size", "queue_consumers_connected"):
+                OptionsResolver.construct_int_option(cli_arguments, config_file_options, queue_conditions, queue_conditions_section_name, key, generic_conditions)
 
         return {"conditions": conditions, "generic_conditions": generic_conditions}

@@ -181,6 +181,38 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa.send_notification.assert_called_once()
 
+    def test_get_queues_returns_queues_when_exist(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+
+        options = self.construct_options()
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        response = self.construct_response_queues()
+        rmqa.send_request = mock.MagicMock(return_value=response)
+        queues = rmqa.get_queues(options)
+
+        logger.info.assert_called_once()
+        logger.error.assert_not_called()
+        rmqa.send_request.assert_called_once()
+        self.assertEquals(["foo", "bar"], queues)
+
+    def test_get_queues_returns_empty_list_when_no_queues_exist(self):
+        logger = mock.MagicMock()
+        rmqa = rabbitmqalert.RabbitMQAlert(logger)
+
+        options = self.construct_options()
+        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+
+        response = self.construct_response_queues_empty()
+        rmqa.send_request = mock.MagicMock(return_value=response)
+        queues = rmqa.get_queues(options)
+
+        logger.info.assert_not_called()
+        logger.error.assert_called_once()
+        rmqa.send_request.assert_called_once()
+        self.assertEquals([], queues)
+
     def test_send_notification_sends_email_when_email_to_is_set(self):
         logger = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger)
@@ -654,6 +686,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             "vhost": "foo",
             "queue": "foo",
             "queues": ["foo"],
+            "queues_discovery": False,
             "generic_conditions": {
                 "ready_queue_size": 0,
                 "unack_queue_size": 0,
@@ -720,6 +753,37 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             { "mem_used": 500000 },
             { "mem_used": 500000 }
         ]
+
+    @staticmethod
+    def construct_response_queues():
+        return {
+            "page_count": 1,
+            "page_size": 300,
+            "page": 1,
+            "filtered_count": 2,
+            "item_count": 2,
+            "total_count": 2,
+            "items": [
+                {
+                    "name": "foo",
+                },
+                {
+                    "name": "bar",
+                }
+            ]
+        }
+
+    @staticmethod
+    def construct_response_queues_empty():
+        return {
+            "page_count": 1,
+            "page_size": 300,
+            "page": 1,
+            "filtered_count": 0,
+            "item_count": 0,
+            "total_count": 0,
+            "items": []
+        }
 
 
 if __name__ == "__main__":

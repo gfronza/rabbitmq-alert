@@ -7,6 +7,7 @@ username=guest
 password=guest
 vhost=%2f
 queues=test
+queues_discovery=False
 check_rate=10
 
 [Conditions]
