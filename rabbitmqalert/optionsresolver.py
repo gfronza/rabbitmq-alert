@@ -5,6 +5,7 @@ import optparse
 import ConfigParser
 import os.path
 
+import apiclient
 import rabbitmqalert
 
 CONFIG_FILE_PATH = "/etc/rabbitmq-alert/config.ini"
@@ -76,7 +77,7 @@ class OptionsResolver:
         options["vhost"] = cli_arguments.vhost or config_file_options.get("Server", "vhost")
         options["check_rate"] = cli_arguments.check_rate or config_file_options.getfloat("Server", "check_rate")
         options["queues_discovery"] = cli_arguments.queues_discovery or (config_file_options.getboolean("Server", "queues_discovery") if config_file_options.has_option("Server", "queues_discovery") else None) or False
-        options["queues"] = (cli_arguments.queues or config_file_options.get("Server", "queues")).split(",") if not options["queues_discovery"] else rabbitmqalert.RabbitMQAlert(self.log).get_queues(options)
+        options["queues"] = (cli_arguments.queues or config_file_options.get("Server", "queues")).split(",") if not options["queues_discovery"] else apiclient.ApiClient(self.log, options).get_queues()
 
         options["email_to"] = cli_arguments.email_to or (config_file_options.get("Email", "to") if config_file_options.has_section("Email") else None)
         options["email_from"] = cli_arguments.email_from or (config_file_options.get("Email", "from") if config_file_options.has_section("Email") else None)

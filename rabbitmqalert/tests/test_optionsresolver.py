@@ -1,10 +1,11 @@
 #! /usr/bin/python2
 # -*- coding: utf8 -*-
 
-import unittest
-import mock
-from . import optionsresolver
 import ConfigParser
+import mock
+import unittest
+
+from . import optionsresolver
 
 
 class OptionsResolverTestCase(unittest.TestCase):
@@ -12,7 +13,7 @@ class OptionsResolverTestCase(unittest.TestCase):
     def setUp(self):
         optionsresolver.os_real = optionsresolver.os
         optionsresolver.optparse.sys.argv[1:] = []
-        optionsresolver.rabbitmqalert_real = optionsresolver.rabbitmqalert
+        optionsresolver.apiclient_real = optionsresolver.apiclient
 
         # Stash the original function to reassign it later
         self.ConfigParser = optionsresolver.ConfigParser.ConfigParser
@@ -20,7 +21,7 @@ class OptionsResolverTestCase(unittest.TestCase):
     def tearDown(self):
         optionsresolver.os = optionsresolver.os_real
         optionsresolver.optparse.sys.argv[1:] = []
-        optionsresolver.rabbitmqalert = optionsresolver.rabbitmqalert_real
+        optionsresolver.apiclient = optionsresolver.apiclient_real
         optionsresolver.ConfigParser.ConfigParser = self.ConfigParser
 
     def test_setup_options_returns_options_when_options_given_and_no_config_file(self):
@@ -423,7 +424,7 @@ class OptionsResolverTestCase(unittest.TestCase):
         optionsresolver.os.path.isfile.side_effect = [False, False]
 
         optionsresolver.optparse.sys.argv[1:] = options
-        optionsresolver.rabbitmqalert.RabbitMQAlert.get_queues = mock.MagicMock(return_value=["foo-queue", "bar-queue"])
+        optionsresolver.apiclient.ApiClient.get_queues = mock.MagicMock(return_value=["foo-queue", "bar-queue"])
         options_result = resolver.setup_options()
 
         self.assertEquals(True, options_result["queues_discovery"])

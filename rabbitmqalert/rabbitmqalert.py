@@ -6,27 +6,28 @@ import json
 import time
 import smtplib
 
+import apiclient
 import logger
 import optionsresolver
 
 
 class RabbitMQAlert:
 
-    def __init__(self, log):
+    def __init__(self, log, client):
         self.log = log
+        self.client = client
 
     def check_queue_conditions(self, options):
-        queue = options["queue"]
-        url = "%s://%s:%s/api/queues/%s/%s" % (options["scheme"], options["host"], options["port"], options["vhost"], options["queue"])
-        data = self.send_request(url, options)
-        if data is None:
+        response = self.client.get_queue()
+        if response is None:
             return
 
-        messages_ready = data.get("messages_ready")
-        messages_unacknowledged = data.get("messages_unacknowledged")
-        messages = data.get("messages")
-        consumers = data.get("consumers")
+        messages_ready = response.get("messages_ready")
+        messages_unacknowledged = response.get("messages_unacknowledged")
+        messages = response.get("messages")
+        consumers = response.get("consumers")
 
+        queue = options["queue"]
         queue_conditions = options["conditions"][queue]
         ready_size = queue_conditions.get("ready_queue_size")
         unack_size = queue_conditions.get("unack_queue_size")
@@ -46,24 +47,22 @@ class RabbitMQAlert:
             self.send_notification(options, "%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
 
     def check_consumer_conditions(self, options):
-        url = "%s://%s:%s/api/consumers" % (options["scheme"], options["host"], options["port"])
-        data = self.send_request(url, options)
-        if data is None:
+        response = self.client.get_consumers()
+        if response is None:
             return
 
-        consumers_connected = len(data)
+        consumers_connected = len(response)
         consumers_connected_min = options["generic_conditions"].get("consumers_connected")
 
         if consumers_connected is not None and consumers_connected < consumers_connected_min:
             self.send_notification(options, "consumers_connected = %d < %d" % (consumers_connected, consumers_connected_min))
 
     def check_connection_conditions(self, options):
-        url = "%s://%s:%s/api/connections" % (options["scheme"], options["host"], options["port"])
-        data = self.send_request(url, options)
-        if data is None:
+        response = self.client.get_connections()
+        if response is None:
             return
 
-        open_connections = len(data)
+        open_connections = len(response)
 
         open_connections_min = options["generic_conditions"].get("open_connections")
 
@@ -71,12 +70,11 @@ class RabbitMQAlert:
             self.send_notification(options, "open_connections = %d < %d" % (open_connections, open_connections_min))
 
     def check_node_conditions(self, options):
-        url = "%s://%s:%s/api/nodes" % (options["scheme"], options["host"], options["port"])
-        data = self.send_request(url, options)
-        if data is None:
+        response = self.client.get_nodes()
+        if response is None:
             return
 
-        nodes_running = len(data)
+        nodes_running = len(response)
 
         conditions = options["generic_conditions"]
         nodes_run = conditions.get("nodes_running")
@@ -85,43 +83,9 @@ class RabbitMQAlert:
         if nodes_run is not None and nodes_running < nodes_run:
             self.send_notification(options, "nodes_running = %d < %d" % (nodes_running, nodes_run))
 
-        for node in data:
+        for node in response:
             if node_memory is not None and node.get("mem_used") > (node_memory * pow(1024, 2)):
                 self.send_notification(options, "Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
-
-    def get_queues(self, options):
-        url = "%s://%s:%s/api/queues?page=1&page_size=300" % (options["scheme"], options["host"], options["port"])
-        data = self.send_request(url, options)
-        if data is None:
-            return []
-
-        queues = []
-        for queue in data.get("items"):
-            queues.append(queue.get("name"))
-
-        if queues:
-            self.log.info("Queues discovered: {0}".format(", ".join(queues)))
-        else:
-            self.log.error("No queues discovered.")
-
-        return queues
-
-    def send_request(self, url, options):
-        password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        password_mgr.add_password(None, url, options["username"], options["password"])
-        handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-        opener = urllib2.build_opener(handler)
-
-        try:
-            request = opener.open(url)
-            response = request.read()
-            request.close()
-
-            data = json.loads(response)
-            return data
-        except (urllib2.HTTPError, urllib2.URLError):
-            self.log.error("Error while consuming the API endpoint \"{0}\"".format(url))
-            return None
 
     def send_notification(self, options, body):
         text = "%s - %s" % (options["host_alias"] or options["host"], body)
@@ -171,10 +135,11 @@ def main():
     log = logger.Logger().get_logger()
     log.info("Starting application...")
 
-    rabbitmq_alert = RabbitMQAlert(log)
-
     opt_resolver = optionsresolver.OptionsResolver(log)
     options = opt_resolver.setup_options()
+
+    client = apiclient.ApiClient(log, options)
+    rabbitmq_alert = RabbitMQAlert(log, client)
 
     while True:
         for queue in options["queues"]:

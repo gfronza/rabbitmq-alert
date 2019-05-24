@@ -2,6 +2,7 @@ deps-dev:
 	sudo pip install -r requirements_dev
 
 test: clean
+	python2 -m rabbitmqalert.tests.test_apiclient -b; \
 	python2 -m rabbitmqalert.tests.test_logger -b; \
 	python2 -m rabbitmqalert.tests.test_optionsresolver -b; \
 	python2 -m rabbitmqalert.tests.test_rabbitmqalert -b;
