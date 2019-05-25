@@ -227,7 +227,7 @@ Run ``rabbitmq`` into a container:
     docker run -d --name some-rabbit --net rabbitmq-alert -p 8080:15672 rabbitmq:3-management
 
 | You can then go to http://localhost:8080 in a browser to use the management plugin.
-The username and password are both ``guest``. Create a fake SMTP server:
+| The username and password are both ``guest``. Create a fake SMTP server:
 
 ::
 

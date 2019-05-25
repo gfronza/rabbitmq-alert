@@ -1,5 +1,5 @@
 deps-dev:
-	sudo pip install -r requirements_dev
+	sudo pip2 install -r requirements_dev
 
 test: clean
 	python2 -m rabbitmqalert.tests.test_apiclient -b; \
@@ -11,7 +11,7 @@ test-install:
 	sudo python2 setup.py install
 
 clean:
-	rm -rf build/ dist/ rabbitmq_alert.egg-info/
+	rm -rf build/ dist/ rabbitmq_alert.egg-info/ .eggs/
 	find . -name *.pyc -delete
 
 dist: clean
@@ -25,3 +25,7 @@ publish: dist
 
 test-publish: dist
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+test-metadata: clean
+	python2 setup.py check --restructuredtext; \
+	python2 setup.py checkdocs
