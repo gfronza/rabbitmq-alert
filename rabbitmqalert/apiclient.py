@@ -1,18 +1,15 @@
-#! /usr/bin/python2
-# -*- coding: utf-8 -*-
-
 import urllib2
 import json
 
 
 class ApiClient:
 
-    def __init__(self, log, options):
+    def __init__(self, log, arguments):
         self.log = log
-        self.options = options
+        self.arguments = arguments
 
     def get_queue(self):
-        uri = "/api/queues/%s/%s" % (self.options["vhost"], self.options["queue"])
+        uri = "/api/queues/%s/%s" % (self.arguments["server_vhost"], self.arguments["server_queue"])
         data = self.send_request(uri)
 
         return data
@@ -53,10 +50,10 @@ class ApiClient:
         return data
 
     def send_request(self, uri):
-        url = "%s://%s:%s%s" % (self.options["scheme"], self.options["host"], self.options["port"], uri)
+        url = "%s://%s:%s%s" % (self.arguments["server_scheme"], self.arguments["server_host"], self.arguments["server_port"], uri)
 
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        password_mgr.add_password(None, url, self.options["username"], self.options["password"])
+        password_mgr.add_password(None, url, self.arguments["server_username"], self.arguments["server_password"])
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
         opener = urllib2.build_opener(handler)
 

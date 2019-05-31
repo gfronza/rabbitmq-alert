@@ -1,25 +1,26 @@
 #! /usr/bin/python2
 # -*- coding: utf8 -*-
 
+import argparse
 import mock
 import unittest
 
 from . import apiclient
-from . import optionsresolver
+from . import argumentsparser
 from . import rabbitmqalert
 
 
 class RabbitMQAlertTestCase(unittest.TestCase):
 
     def setUp(self):
+        rabbitmqalert.argumentsparser_real = rabbitmqalert.argumentsparser
         rabbitmqalert.logger_real = rabbitmqalert.logger
         rabbitmqalert.urllib2_real = rabbitmqalert.urllib2
-        optionsresolver.OptionsResolver.setup_options_real = optionsresolver.OptionsResolver.setup_options
 
     def tearDown(self):
+        rabbitmqalert.argumentsparser = rabbitmqalert.argumentsparser_real
         rabbitmqalert.logger = rabbitmqalert.logger_real
         rabbitmqalert.urllib2 = rabbitmqalert.urllib2_real
-        optionsresolver.OptionsResolver.setup_options = optionsresolver.OptionsResolver.setup_options_real
 
     def test_check_queue_conditions_exits_when_no_response_from_client(self):
         logger = mock.MagicMock()
@@ -28,7 +29,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(self.construct_options())
+        rmqa.check_queue_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -39,7 +40,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(self.construct_options())
+        rmqa.check_queue_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -53,7 +54,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(self.construct_options())
+        rmqa.check_queue_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -67,7 +68,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(self.construct_options())
+        rmqa.check_queue_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -81,16 +82,16 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(self.construct_options())
+        rmqa.check_queue_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
     def test_check_queue_conditions_sends_notification_when_beneath_consumers(self):
         response = self.construct_response_queue()
         response["consumers"] = 0
-        options = self.construct_options()
-        options["generic_conditions"]["queue_consumers_connected"] = 1
-        options["conditions"]["foo"]["queue_consumers_connected"] = 1
+        arguments = self.construct_arguments()
+        arguments["generic_conditions"]["conditions_queue_consumers_connected"] = 1
+        arguments["conditions"]["foo"]["conditions_queue_consumers_connected"] = 1
 
         logger = mock.MagicMock()
         client = mock.MagicMock()
@@ -98,7 +99,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_queue_conditions(options)
+        rmqa.check_queue_conditions(arguments)
 
         rmqa.send_notification.assert_called_once()
 
@@ -109,7 +110,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_consumer_conditions(self.construct_options())
+        rmqa.check_consumer_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -120,7 +121,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_consumer_conditions(self.construct_options())
+        rmqa.check_consumer_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -133,7 +134,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_consumer_conditions(self.construct_options())
+        rmqa.check_consumer_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -144,7 +145,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_connection_conditions(self.construct_options())
+        rmqa.check_connection_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -155,7 +156,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_connection_conditions(self.construct_options())
+        rmqa.check_connection_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -168,7 +169,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_connection_conditions(self.construct_options())
+        rmqa.check_connection_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -179,7 +180,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_node_conditions(self.construct_options())
+        rmqa.check_node_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -190,7 +191,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_node_conditions(self.construct_options())
+        rmqa.check_node_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_not_called()
 
@@ -203,7 +204,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_node_conditions(self.construct_options())
+        rmqa.check_node_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -217,7 +218,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
         rmqa.send_notification = mock.MagicMock()
-        rmqa.check_node_conditions(self.construct_options())
+        rmqa.check_node_conditions(self.construct_arguments())
 
         rmqa.send_notification.assert_called_once()
 
@@ -226,12 +227,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_not_called()
 
@@ -242,7 +243,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(self.construct_options(), "")
+        rmqa.send_notification(self.construct_arguments(), "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once()
 
@@ -251,12 +252,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_password"] = "password"
+        arguments = self.construct_arguments()
+        arguments["email_password"] = "password"
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP().login.assert_called_once()
 
@@ -267,7 +268,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(self.construct_options(), "")
+        rmqa.send_notification(self.construct_arguments(), "")
 
         rabbitmqalert.smtplib.SMTP().login.assert_not_called()
 
@@ -276,12 +277,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_ssl"] = True
+        arguments = self.construct_arguments()
+        arguments["email_ssl"] = True
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP_SSL().sendmail.assert_called_once()
 
@@ -290,54 +291,54 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_ssl"] = False
+        arguments = self.construct_arguments()
+        arguments["email_ssl"] = False
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP_SSL().sendmail.assert_not_called()
 
-    def test_send_notification_sends_to_slack_and_telegram_when_options_are_set(self):
+    def test_send_notification_sends_to_slack_and_telegram_when_arguments_are_set(self):
         logger = mock.MagicMock()
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
+        arguments = self.construct_arguments()
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
-        rabbitmqalert.urllib2.urlopen.call_count = 2
+        self.assertEquals(2, rabbitmqalert.urllib2.urlopen.call_count)
 
-    def test_send_notification_does_not_send_to_slack_when_any_option_not_set(self):
+    def test_send_notification_does_not_send_to_slack_when_any_argument_not_set(self):
         logger = mock.MagicMock()
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["slack_url"] = None
+        arguments = self.construct_arguments()
+        arguments["slack_url"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         # only telegram is called
         rabbitmqalert.urllib2.urlopen.assert_called_once()
 
-    def test_send_notification_does_not_send_to_telegram_when_any_option_not_set(self):
+    def test_send_notification_does_not_send_to_telegram_when_any_argument_not_set(self):
         logger = mock.MagicMock()
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         # only slack is called
         rabbitmqalert.urllib2.urlopen.assert_called_once()
@@ -347,12 +348,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["host_alias"] = "bar-host"
+        arguments = self.construct_arguments()
+        arguments["server_host_alias"] = "bar-host"
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "Subject: foo bar-host foo\n\nbar-host - ")
 
@@ -361,12 +362,12 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["host_alias"] = None
+        arguments = self.construct_arguments()
+        arguments["server_host_alias"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         rabbitmqalert.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "Subject: foo foo-host foo\n\nfoo-host - ")
 
@@ -375,13 +376,13 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["slack_url"] = None
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_called_once()
 
@@ -390,14 +391,14 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
-        options["slack_url"] = None
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_not_called()
 
@@ -406,13 +407,13 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_called_once()
 
@@ -421,14 +422,14 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
-        options["slack_url"] = None
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_not_called()
 
@@ -437,13 +438,13 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
-        options["slack_url"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_called_once()
 
@@ -452,16 +453,20 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         client = mock.MagicMock()
         rmqa = rabbitmqalert.RabbitMQAlert(logger, client)
 
-        options = self.construct_options()
-        options["email_to"] = None
-        options["slack_url"] = None
-        options["telegram_bot_id"] = None
+        arguments = self.construct_arguments()
+        arguments["email_to"] = None
+        arguments["slack_url"] = None
+        arguments["telegram_bot_id"] = None
 
         rabbitmqalert.smtplib = mock.MagicMock()
         rabbitmqalert.urllib2 = mock.MagicMock()
-        rmqa.send_notification(options, "")
+        rmqa.send_notification(arguments, "")
 
         logger.info.assert_not_called()
+
+    def test_setup_arguments_returns_parser(self):
+        parser = rabbitmqalert.setup_arguments()
+        self.assertIsInstance(parser, argparse.ArgumentParser)
 
     def test_main_runs_check_queue_conditions_when_ready_queue_size_in_queue_conditions(self):
         client = mock.MagicMock()
@@ -474,13 +479,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["conditions"] = {
-            "foo": {
-                "ready_queue_size": 1
-            }
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["conditions"]["foo"]["conditions_ready_queue_size"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -500,13 +502,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["conditions"] = {
-            "foo": {
-                "unack_queue_size": 1
-            }
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["conditions"]["foo"]["conditions_unack_queue_size"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -526,13 +525,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["conditions"] = {
-            "foo": {
-                "total_queue_size": 1
-            }
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["conditions"]["foo"]["conditions_total_queue_size"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -552,13 +548,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["conditions"] = {
-            "foo": {
-                "queue_consumers_connected": 1
-            }
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["conditions"]["foo"]["conditions_queue_consumers_connected"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -578,11 +571,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["generic_conditions"] = {
-            "nodes_running": 1
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["generic_conditions"]["conditions_nodes_running"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -602,11 +594,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["generic_conditions"] = {
-            "node_memory_used": 1
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["generic_conditions"]["conditions_node_memory_used"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -626,11 +617,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["generic_conditions"] = {
-            "open_connections": 1
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["generic_conditions"]["conditions_open_connections"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -650,11 +640,10 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rabbitmqalert.time.sleep = mock.MagicMock(side_effect=ValueError)
         rmqa = rabbitmqalert.RabbitMQAlert(rabbitmqalert.logger, client)
 
-        options = self.construct_options()
-        options["generic_conditions"] = {
-            "consumers_connected": 1
-        }
-        optionsresolver.OptionsResolver.setup_options = mock.MagicMock(return_value=options)
+        arguments = self.construct_arguments()
+        arguments["generic_conditions"]["conditions_consumers_connected"] = 1
+        rabbitmqalert.argumentsparser = mock.MagicMock()
+        rabbitmqalert.argumentsparser.ArgumentsParser(mock.MagicMock()).parse = mock.MagicMock(return_value=arguments)
 
         try:
             rabbitmqalert.main()
@@ -664,33 +653,30 @@ class RabbitMQAlertTestCase(unittest.TestCase):
         rmqa.check_consumer_conditions.assert_called()
 
     @staticmethod
-    def construct_options():
-        options = {
-            "scheme": "http",
-            "host": "foo-host",
-            "port": 1,
-            "host_alias": "bar-host",
-            "vhost": "foo",
-            "queue": "foo",
-            "queues": ["foo"],
-            "queues_discovery": False,
-            "check_rate": 1,
+    def construct_arguments():
+        arguments = {
+            "config_file": None,
+            "server_scheme": "http",
+            "server_host": "foo-host",
+            "server_port": 1,
+            "server_host_alias": "bar-host",
+            "server_vhost": "foo",
+            "server_queue": "foo",
+            "server_queues": ["foo"],
+            "server_queues_discovery": False,
+            "server_check_rate": 1,
             "generic_conditions": {
-                "ready_queue_size": 0,
-                "unack_queue_size": 0,
-                "total_queue_size": 0,
-                "queue_consumers_connected": 0,
-                "consumers_connected": 1,
-                "open_connections": 1,
-                "nodes_running": 1,
-                "node_memory_used": 1
+                "conditions_consumers_connected": 1,
+                "conditions_open_connections": 1,
+                "conditions_nodes_running": 1,
+                "conditions_node_memory_used": 1
             },
             "conditions": {
                 "foo": {
-                    "ready_queue_size": 0,
-                    "unack_queue_size": 0,
-                    "total_queue_size": 0,
-                    "queue_consumers_connected": 0,
+                    "conditions_ready_queue_size": 0,
+                    "conditions_unack_queue_size": 0,
+                    "conditions_total_queue_size": 0,
+                    "conditions_queue_consumers_connected": 0,
                 }
             },
             "email_to": ["foo@foobar.com"],
@@ -706,7 +692,7 @@ class RabbitMQAlertTestCase(unittest.TestCase):
             "telegram_channel": "foo_channel"
         }
 
-        return options
+        return arguments
 
     @staticmethod
     def construct_response_queue():

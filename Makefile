@@ -3,9 +3,10 @@ deps-dev:
 
 test: clean
 	python2 -m rabbitmqalert.tests.test_apiclient -b; \
+	python2 -m rabbitmqalert.tests.test_argumentsparser -b; \
 	python2 -m rabbitmqalert.tests.test_logger -b; \
-	python2 -m rabbitmqalert.tests.test_optionsresolver -b; \
-	python2 -m rabbitmqalert.tests.test_rabbitmqalert -b;
+	python2 -m rabbitmqalert.tests.test_rabbitmqalert -b; \
+	python2 -m rabbitmqalert.tests.models.test_argument -b;
 
 test-install:
 	sudo python2 setup.py install
