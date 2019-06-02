@@ -5,9 +5,9 @@ from collections import namedtuple
 import mock
 import unittest
 
-from . import argumentsparser
-from ..models import argument
-from . import rabbitmqalert
+from rabbitmqalert import argumentsparser
+from rabbitmqalert.models import argument
+from rabbitmqalert import rabbitmqalert
 
 
 class ArgumentsParserTestCase(unittest.TestCase):

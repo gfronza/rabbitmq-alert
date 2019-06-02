@@ -190,6 +190,10 @@ everything is still fine:
 
     make test
 
+Firstly, ensure that you have removed the rabbitmqalert package from your system.
+Otherwise you may find yourself running the tests on the installed package
+instead of the source code.
+
 Do add tests yourself for the code you contribute to ensure the quality
 of the project.
 

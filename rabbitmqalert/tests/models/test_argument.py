@@ -4,9 +4,9 @@
 import mock
 import unittest
 
-from . import models
-from . import argumentsparser
-from . import rabbitmqalert
+from rabbitmqalert import models
+from rabbitmqalert import argumentsparser
+from rabbitmqalert import rabbitmqalert
 
 
 class ArgumentTestCase(unittest.TestCase):

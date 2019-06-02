@@ -6,7 +6,7 @@ import mock
 import unittest
 import urllib2
 
-from . import apiclient
+from rabbitmqalert import apiclient
 
 
 class ApiClientTestCase(unittest.TestCase):

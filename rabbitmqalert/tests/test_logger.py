@@ -5,7 +5,7 @@ import logging
 import mock
 import unittest
 
-from . import logger
+from rabbitmqalert import logger
 
 
 class LoggerTestCase(unittest.TestCase):

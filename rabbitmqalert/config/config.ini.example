@@ -1,7 +1,7 @@
 [Server]
 scheme=http
 host=localhost
-port=8080
+port=15672
 host_alias=myserver
 username=guest
 password=guest

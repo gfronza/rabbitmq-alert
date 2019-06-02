@@ -5,9 +5,9 @@ import argparse
 import mock
 import unittest
 
-from . import apiclient
-from . import argumentsparser
-from . import rabbitmqalert
+from rabbitmqalert import apiclient
+from rabbitmqalert import argumentsparser
+from rabbitmqalert import rabbitmqalert
 
 
 class RabbitMQAlertTestCase(unittest.TestCase):

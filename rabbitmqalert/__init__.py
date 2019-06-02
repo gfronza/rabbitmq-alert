@@ -1,5 +1,5 @@
-from . import apiclient
-from . import argumentsparser
-from . import logger
-from . import models
-from . import rabbitmqalert
+import apiclient
+import argumentsparser
+import logger
+import models
+import rabbitmqalert
