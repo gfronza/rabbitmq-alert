@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import smtplib
 import time
-import urllib2
 
 import apiclient
 import argumentsparser
 import logger
+import notifier
 
 
 class RabbitMQAlert:
 
-    def __init__(self, log, client):
+    def __init__(self, log, client, notifier_object):
         self.log = log
         self.client = client
+        self.notifier = notifier_object
 
     def check_queue_conditions(self, arguments):
         response = self.client.get_queue()
@@ -35,16 +35,16 @@ class RabbitMQAlert:
         consumers_connected_min = queue_conditions.get("conditions_queue_consumers_connected")
 
         if ready_size is not None and messages_ready > ready_size:
-            self.send_notification(arguments, "%s: messages_ready = %d > %d" % (queue, messages_ready, ready_size))
+            self.notifier.send_notification("%s: messages_ready = %d > %d" % (queue, messages_ready, ready_size))
 
         if unack_size is not None and messages_unacknowledged > unack_size:
-            self.send_notification(arguments, "%s: messages_unacknowledged = %d > %d" % (queue, messages_unacknowledged, unack_size))
+            self.notifier.send_notification("%s: messages_unacknowledged = %d > %d" % (queue, messages_unacknowledged, unack_size))
 
         if total_size is not None and messages > total_size:
-            self.send_notification(arguments, "%s: messages = %d > %d" % (queue, messages, total_size))
+            self.notifier.send_notification("%s: messages = %d > %d" % (queue, messages, total_size))
 
         if consumers_connected_min is not None and consumers < consumers_connected_min:
-            self.send_notification(arguments, "%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
+            self.notifier.send_notification("%s: consumers_connected = %d < %d" % (queue, consumers, consumers_connected_min))
 
     def check_consumer_conditions(self, arguments):
         response = self.client.get_consumers()
@@ -55,7 +55,7 @@ class RabbitMQAlert:
         consumers_connected_min = arguments["generic_conditions"].get("conditions_consumers_connected")
 
         if consumers_connected is not None and consumers_connected < consumers_connected_min:
-            self.send_notification(arguments, "consumers_connected = %d < %d" % (consumers_connected, consumers_connected_min))
+            self.notifier.send_notification("consumers_connected = %d < %d" % (consumers_connected, consumers_connected_min))
 
     def check_connection_conditions(self, arguments):
         response = self.client.get_connections()
@@ -67,7 +67,7 @@ class RabbitMQAlert:
         open_connections_min = arguments["generic_conditions"].get("conditions_open_connections")
 
         if open_connections is not None and open_connections < open_connections_min:
-            self.send_notification(arguments, "open_connections = %d < %d" % (open_connections, open_connections_min))
+            self.notifier.send_notification("open_connections = %d < %d" % (open_connections, open_connections_min))
 
     def check_node_conditions(self, arguments):
         response = self.client.get_nodes()
@@ -81,53 +81,11 @@ class RabbitMQAlert:
         node_memory = conditions.get("conditions_node_memory_used")
 
         if nodes_run is not None and nodes_running < nodes_run:
-            self.send_notification(arguments, "nodes_running = %d < %d" % (nodes_running, nodes_run))
+            self.notifier.send_notification("nodes_running = %d < %d" % (nodes_running, nodes_run))
 
         for node in response:
             if node_memory is not None and node.get("mem_used") > (node_memory * pow(1024, 2)):
-                self.send_notification(arguments, "Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
-
-    def send_notification(self, arguments, body):
-        text = "%s - %s" % (arguments["server_host_alias"] or arguments["server_host"], body)
-
-        if arguments["email_to"]:
-            self.log.info("Sending email notification: \"{0}\"".format(body))
-
-            server = smtplib.SMTP(arguments["email_server"], 25)
-
-            if arguments["email_ssl"]:
-                server = smtplib.SMTP_SSL(arguments["email_server"], 465)
-
-            if arguments["email_password"]:
-                server.login(arguments["email_from"], arguments["email_password"])
-
-            recipients = arguments["email_to"]
-            # add subject as header before message text
-            subject_email = arguments["email_subject"] % (arguments["server_host_alias"] or arguments["server_host"], arguments["server_queue"])
-            text_email = "Subject: %s\n\n%s" % (subject_email, text)
-            server.sendmail(arguments["email_from"], recipients, text_email)
-            server.quit()
-
-        if arguments["slack_url"] and arguments["slack_channel"] and arguments["slack_username"]:
-            self.log.info("Sending Slack notification: \"{0}\"".format(body))
-
-            # escape double quotes from possibly breaking the slack message payload
-            text_slack = text.replace("\"", "\\\"")
-            slack_payload = '{"channel": "#%s", "username": "%s", "text": "%s"}' % (arguments["slack_channel"], arguments["slack_username"], text_slack)
-
-            request = urllib2.Request(arguments["slack_url"], slack_payload)
-            response = urllib2.urlopen(request)
-            response.close()
-
-        if arguments["telegram_bot_id"] and arguments["telegram_channel"]:
-            self.log.info("Sending Telegram notification: \"{0}\"".format(body))
-
-            text_telegram = "%s: %s" % (arguments["server_queue"], text)
-            telegram_url = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s" % (arguments["telegram_bot_id"], arguments["telegram_channel"], text_telegram)
-
-            request = urllib2.Request(telegram_url)
-            response = urllib2.urlopen(request)
-            response.close()
+                self.notifier.send_notification("Node %s - node_memory_used = %d > %d MBs" % (node.get("name"), node.get("mem_used"), node_memory))
 
 
 def setup_arguments():
@@ -188,7 +146,8 @@ def main():
     arguments = arguments_parser.parse(arguments)
 
     client = apiclient.ApiClient(log, arguments)
-    rabbitmq_alert = RabbitMQAlert(log, client)
+    notifier_object = notifier.Notifier(log, arguments)
+    rabbitmq_alert = RabbitMQAlert(log, client, notifier_object)
 
     while True:
         for queue in arguments["server_queues"]:
