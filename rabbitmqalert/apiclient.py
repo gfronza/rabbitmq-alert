@@ -18,6 +18,7 @@ class ApiClient:
         uri = "/api/queues?page=1&page_size=300"
         data = self.send_request(uri)
         if data is None:
+            self.log.error("No queues discovered (request failed).")
             return []
 
         queues = []

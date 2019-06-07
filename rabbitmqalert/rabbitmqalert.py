@@ -26,7 +26,7 @@ def setup_arguments():
     server.add_argument("--password", dest="server_password", help="RabbitMQ API password", type=str)
     server.add_argument("--vhost", dest="server_vhost", help="Name of the vhost to inspect", type=str)
     server.add_argument("--queues", dest="server_queues", help="List of comma-separated queue names to inspect", type=str)
-    server.add_argument("--queues-discovery", dest="server_queues_discovery", help="Discover queues", action="store_true")
+    server.add_argument("--queues-discovery", dest="server_queues_discovery", help="Discover queues", default=None, action="store_true")
     server.add_argument("--check-rate", dest="server_check_rate", help="Conditions check frequency, in seconds.", type=int)
 
     conditions = parser.add_argument_group("Conditions")
@@ -45,7 +45,7 @@ def setup_arguments():
     email.add_argument("--email-subject", dest="email_subject", help="The email subject", type=str)
     email.add_argument("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type=str)
     email.add_argument("--email-password", dest="email_password", help="The password for the authentication on the mail server", type=str)
-    email.add_argument("--email-ssl", dest="email_ssl", help="Use SSL to send email", action="store_true")
+    email.add_argument("--email-ssl", dest="email_ssl", help="Use SSL to send email", default=None, action="store_true")
 
     slack = parser.add_argument_group("Slack")
     slack.add_argument("--slack-url", dest="slack_url", help="Slack hook URL", type=str)

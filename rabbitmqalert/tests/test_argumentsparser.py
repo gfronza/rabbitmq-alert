@@ -46,7 +46,7 @@ class ArgumentsParserTestCase(unittest.TestCase):
         parser.validate = mock.MagicMock()
         parser.format_conditions = mock.MagicMock()
 
-        result = parser.parse(argparse_parser)
+        parser.parse(argparse_parser)
 
         # count the number of arguments
         group_arguments_count = 0
@@ -74,7 +74,7 @@ class ArgumentsParserTestCase(unittest.TestCase):
         parser.validate = mock.MagicMock()
         parser.format_conditions = mock.MagicMock()
 
-        result = parser.parse(argparse_parser)
+        parser.parse(argparse_parser)
 
         # create a copy of the arguments in the form they would look like after parsing them (behore calling validate)
         arguments_dict = vars(argparse_parser.parse_args(arguments_list))
@@ -82,6 +82,7 @@ class ArgumentsParserTestCase(unittest.TestCase):
         arguments_dict["email_to"] = arguments_dict["email_to"].split(",")
         arguments_dict["help"] = None
         arguments_dict["queue_conditions"] = dict()
+        arguments_dict["email_ssl"] = False
 
         argumentsparser.apiclient.ApiClient.get_queues.assert_called_once()
         parser.validate.assert_called_once_with(arguments_dict)
@@ -102,7 +103,7 @@ class ArgumentsParserTestCase(unittest.TestCase):
         parser.validate = mock.MagicMock()
         parser.format_conditions = mock.MagicMock()
 
-        result = parser.parse(argparse_parser)
+        parser.parse(argparse_parser)
 
         # create a copy of the arguments in the form they would look like after parsing them (behore calling validate)
         arguments_dict = vars(argparse_parser.parse_args(arguments_list))
@@ -110,6 +111,8 @@ class ArgumentsParserTestCase(unittest.TestCase):
         arguments_dict["email_to"] = arguments_dict["email_to"].split(",")
         arguments_dict["help"] = None
         arguments_dict["queue_conditions"] = dict()
+        arguments_dict["server_queues_discovery"] = False
+        arguments_dict["email_ssl"] = False
 
         parser.validate.assert_called_once_with(arguments_dict)
 
@@ -127,7 +130,7 @@ class ArgumentsParserTestCase(unittest.TestCase):
         parser.validate = mock.MagicMock()
         parser.format_conditions = mock.MagicMock()
 
-        result = parser.parse(argparse_parser)
+        parser.parse(argparse_parser)
 
         # create a copy of the arguments in the form they would look like after parsing them (behore calling validate)
         arguments_dict = vars(argparse_parser.parse_args(arguments_list))
@@ -135,6 +138,8 @@ class ArgumentsParserTestCase(unittest.TestCase):
         arguments_dict["email_to"] = arguments_dict["email_to"].split(",")
         arguments_dict["help"] = None
         arguments_dict["queue_conditions"] = dict()
+        arguments_dict["server_queues_discovery"] = False
+        arguments_dict["email_ssl"] = False
 
         # checks for non-standard group for queue specific conditions
         argumentsparser.argument.Argument.files_have_group.assert_called_once_with("Conditions:foo-queue")
@@ -158,13 +163,15 @@ class ArgumentsParserTestCase(unittest.TestCase):
         parser.validate = mock.MagicMock()
         parser.format_conditions = mock.MagicMock()
 
-        result = parser.parse(argparse_parser)
+        parser.parse(argparse_parser)
 
         # create a copy of the arguments in the form they would look like after parsing them (behore calling validate)
         arguments_dict = vars(argparse_parser.parse_args(arguments_list))
         arguments_dict["server_queues"] = arguments_dict["server_queues"].split(",")
         arguments_dict["email_to"] = arguments_dict["email_to"].split(",")
         arguments_dict["help"] = None
+        arguments_dict["server_queues_discovery"] = False
+        arguments_dict["email_ssl"] = False
         arguments_dict["queue_conditions"] = {
             "foo-queue": {
                 "conditions_total_queue_size": 40,
@@ -204,6 +211,8 @@ class ArgumentsParserTestCase(unittest.TestCase):
         arguments_dict["server_queues"] = arguments_dict["server_queues"].split(",")
         arguments_dict["email_to"] = arguments_dict["email_to"].split(",")
         arguments_dict["help"] = None
+        arguments_dict["server_queues_discovery"] = False
+        arguments_dict["email_ssl"] = False
         arguments_dict["queue_conditions"] = dict()
 
         arguments_dict = dict(arguments_dict.items() + parser.format_conditions(arguments_dict).items())
