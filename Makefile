@@ -26,6 +26,9 @@ dist-inspect:
 publish: dist
 	twine upload dist/*
 
+lint:
+	pylint rabbitmqalert --ignore=tests
+
 test-publish: dist
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
