@@ -76,12 +76,12 @@ class Argument:
     def get_value(self, group, argument):
 
         def foo():
-            # get value from cli arguments
-            yield (self.arguments[argument.dest] if argument.dest in self.arguments else None)
             # get value from configuration file (given or global configuration file)
             yield self.get_value_from_file(self.file, group, argument)
             # get value from the defaults file
             yield self.get_value_from_file(self.defaults, group, argument)
+            # get value from cli arguments
+            yield (self.arguments[argument.dest] if argument.dest in self.arguments else None)
 
         value = None
         try:
