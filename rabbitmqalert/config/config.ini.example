@@ -22,6 +22,7 @@ node_memory_used=100
 
 [Email]
 from=admin@example.com
+login=admin_example
 to=admin@example.com
 subject=RabbitMQ alert - Condition met at %s - %s
 host=localhost

@@ -20,13 +20,14 @@ class Notifier():
                 server = smtplib.SMTP_SSL(self.arguments["email_server"], 465)
 
             if self.arguments["email_password"]:
-                server.login(self.arguments["email_from"], self.arguments["email_password"])
-
+                server.login(self.arguments["email_login"], self.arguments["email_password"])
+            
+            email_from = self.arguments["email_from"]
             recipients = self.arguments["email_to"]
             # add subject as header before message text
             subject_email = self.arguments["email_subject"] % (self.arguments["server_host_alias"] or self.arguments["server_host"], self.arguments["server_queue"])
-            text_email = "Subject: %s\n\n%s" % (subject_email, text)
-            server.sendmail(self.arguments["email_from"], recipients, text_email)
+            text_email = "From: %s\nSubject: %s\n\n%s" % (email_from, subject_email, text)
+            server.sendmail(email_from, recipients, text_email)
             server.quit()
 
         if self.arguments["slack_url"] and self.arguments["slack_channel"] and self.arguments["slack_username"]:
