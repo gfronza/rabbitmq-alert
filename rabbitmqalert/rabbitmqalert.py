@@ -40,8 +40,10 @@ def setup_arguments():
     conditions.add_argument("--node-memory-used", dest="conditions_node_memory_used", help="Memory used by each node in MBs", type=int)
 
     email = parser.add_argument_group("Email")
+
     email.add_argument("--email-to", dest="email_to", help="List of comma-separated email addresses to send notification to", type=str)
     email.add_argument("--email-from", dest="email_from", help="The sender email address", type=str)
+    email.add_argument("--email-login", dest="email_login", help="The sender email login", type=str)
     email.add_argument("--email-subject", dest="email_subject", help="The email subject", type=str)
     email.add_argument("--email-server", dest="email_server", help="The hostname or IP address of the mail server", type=str)
     email.add_argument("--email-password", dest="email_password", help="The password for the authentication on the mail server", type=str)
