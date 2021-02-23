@@ -20,7 +20,10 @@ class Notifier():
                 server = smtplib.SMTP_SSL(self.arguments["email_server"], 465)
 
             if self.arguments["email_password"]:
-                server.login(self.arguments["email_login"], self.arguments["email_password"])
+                if self.arguments["email_login"]:
+                    server.login(self.arguments["email_login"], self.arguments["email_password"])
+                else:
+                    server.login(self.arguments["email_from"], self.arguments["email_password"])
             
             email_from = self.arguments["email_from"]
             recipients = self.arguments["email_to"]
