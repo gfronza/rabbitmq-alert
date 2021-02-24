@@ -2,7 +2,7 @@ import smtplib
 import urllib2
 
 
-class Notifier():
+class Notifier:
 
     def __init__(self, logger, arguments):
         self.log = logger

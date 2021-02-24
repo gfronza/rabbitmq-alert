@@ -70,6 +70,39 @@ class NotifierTestCase(unittest.TestCase):
 
         notifier.smtplib.SMTP().login.assert_not_called()
 
+    def test_send_notification_logs_in_with_email_login_when_set(self):
+        logger = mock.MagicMock()
+        client = mock.MagicMock()
+
+        arguments = self.construct_arguments()
+        arguments["email_login"] = "email_login@foobar.com"
+        arguments["email_password"] = "password"
+
+        notifier_object = notifier.Notifier(logger, arguments)
+
+        notifier.smtplib = mock.MagicMock()
+        notifier.urllib2 = mock.MagicMock()
+        notifier_object.send_notification("")
+
+        notifier.smtplib.SMTP().login.assert_called_once_with("email_login@foobar.com", "password")
+
+    def test_send_notification_logs_in_with_email_from_when_email_login_not_set(self):
+        logger = mock.MagicMock()
+        client = mock.MagicMock()
+
+        arguments = self.construct_arguments()
+        arguments["email_from"] = "test@foobar.com"
+        arguments["email_login"] = ""
+        arguments["email_password"] = "password"
+
+        notifier_object = notifier.Notifier(logger, arguments)
+
+        notifier.smtplib = mock.MagicMock()
+        notifier.urllib2 = mock.MagicMock()
+        notifier_object.send_notification("")
+
+        notifier.smtplib.SMTP().login.assert_called_once_with("test@foobar.com", "password")
+
     def test_send_notification_sends_email_with_ssl_when_email_ssl_is_set(self):
         logger = mock.MagicMock()
         client = mock.MagicMock()
@@ -157,7 +190,7 @@ class NotifierTestCase(unittest.TestCase):
         notifier.urllib2 = mock.MagicMock()
         notifier_object.send_notification("")
 
-        notifier.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "Subject: foo bar-host foo\n\nbar-host - ")
+        notifier.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "From: bar@foobar.com\nSubject: foo bar-host foo\n\nbar-host - ")
 
     def test_send_notification_does_not_use_host_alias_when_not_set(self):
         logger = mock.MagicMock()
@@ -172,7 +205,7 @@ class NotifierTestCase(unittest.TestCase):
         notifier.urllib2 = mock.MagicMock()
         notifier_object.send_notification("")
 
-        notifier.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "Subject: foo foo-host foo\n\nfoo-host - ")
+        notifier.smtplib.SMTP().sendmail.assert_called_once_with("bar@foobar.com", ["foo@foobar.com"], "From: bar@foobar.com\nSubject: foo foo-host foo\n\nfoo-host - ")
 
     def test_send_notification_logs_info_when_email_is_sent(self):
         logger = mock.MagicMock()
@@ -302,6 +335,7 @@ class NotifierTestCase(unittest.TestCase):
             },
             "email_to": ["foo@foobar.com"],
             "email_from": "bar@foobar.com",
+            "email_login": "bar@foobar.com",
             "email_subject": "foo %s %s",
             "email_server": "mail.foobar.com",
             "email_password": "",

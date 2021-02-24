@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os import path
 
 # remember to push a new tag after changing this!
-VERSION = "1.8.1"
+VERSION = "1.9.0"
 
 DIST_CONFIG_PATH = "rabbitmqalert/config"
 
@@ -33,7 +33,7 @@ setup(
     long_description=generate_readme(),
     packages=find_packages(exclude=["*tests*"]),
     description="Send notifications when predefined conditions are met",
-    author="Germano Fronza (gfronza), Kostas Milonas (mylk), velika12, Robert Kopaczewski (23doors), Ivan Timeev (TeslA1402), Anderson Diego Kulpa Fachini (anderson-fachini)",
+    author="Germano Fronza (gfronza), Kostas Milonas (mylk), velika12, Robert Kopaczewski (23doors), Ivan Timeev (TeslA1402), Anderson Diego Kulpa Fachini (anderson-fachini), Dawid Deregowski (Venomen)",
     author_email="germano.inf@gmail.com",
     url="https://github.com/gfronza/rabbitmq-alert",
     download_url="https://github.com/gfronza/rabbitmq-alert/tarball/" + VERSION,
