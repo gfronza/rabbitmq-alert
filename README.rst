@@ -41,21 +41,6 @@ Use the ``PIP`` command, which should already exist in your Linux installation:
 Usage
 =====
 
-Execute with the global configuration file
-------------------------------------------
-Copy the example configuration file to the default path of the global configuration file:
-
-::
-
-    sudo cp /etc/rabbitmq-alert/config.ini.example /etc/rabbitmq-alert/config.ini
-
-| Edit it with you preferred settings. Then you are ready to execute ``rabbitmq-alert``
-| using the global configuration file. Just execute:
-
-::
-
-    sudo rabbitmq-alert
-
 Execute with options
 --------------------
 
@@ -73,6 +58,21 @@ Example:
         --email-to=admin@example.com --email-from=admin@example.com \
         --email-subject="RabbitMQ alert at %s - %s" --email-server=localhost
 
+Execute with the global configuration file
+------------------------------------------
+Copy the example configuration file to the default path of the global configuration file:
+
+::
+
+    sudo cp /etc/rabbitmq-alert/config.ini.example /etc/rabbitmq-alert/config.ini
+
+| Edit it with you preferred settings. Then you are ready to execute ``rabbitmq-alert``
+| using the global configuration file. Just execute:
+
+::
+
+    sudo rabbitmq-alert
+
 Execute with a custom configuration file
 ----------------------------------------
 
@@ -85,6 +85,32 @@ Then execute ``rabbitmq-alert`` with the configuration file option:
 ::
 
     sudo rabbitmq-alert -c my_config.ini
+
+For a detailed description of the available sections and options, `view this wiki page <https://github.com/gfronza/rabbitmq-alert/wiki/Configuration-file>`_.
+
+Different options per queue
+---------------------------
+| Except conditions for all queues, you can also define queue specific conditions
+| in the configuration file, in case you want to have fine-tuned options for each queue.
+| Just create a ``[Conditions]`` section for each queue. Example:
+
+::
+
+    [Conditions:my-queue]
+    ...
+
+    [Conditions:my-other-queue]
+    ...
+
+Note that queue names also have to be defined in the ``[Server]``
+section of the configuration file:
+
+::
+
+    [Server]
+    ...
+    queues=my-queue,my-other-queue
+    ...
 
 Execute as a daemon
 -------------------
@@ -117,36 +143,6 @@ To have ``rabbitmq-alert`` always started on boot:
 
     sudo update-rc.d rabbitmq-alert defaults
 
-Different options per queue
----------------------------
-| Except conditions for all queues, you can also define queue specific conditions
-| in the configuration file, in case you want to have fine-tuned options for each queue.
-| Just create a ``[Conditions]`` section for each queue. Example:
-
-::
-
-    [Conditions:my-queue]
-    ...
-
-    [Conditions:my-other-queue]
-    ...
-
-Note that queue names also have to be defined in the ``[Server]``
-section of the configuration file:
-
-::
-
-    [Server]
-    ...
-    queues=my-queue,my-other-queue
-    ...
-
-Logging
--------
-
-| You can find the logs of ``rabbitmq-alert`` to ``/var/log/rabbitmq-alert/``.
-| Log files are rotated in a daily basis.
-
 Execute in a container
 ----------------------
 
@@ -160,6 +156,12 @@ Execute in a container
     mylkoh/rabbitmq-alert:latest
 
 For the configuration file, advise the ``config.ini.example`` that exists in the project's repository.
+
+Logging
+-------
+
+| You can find the logs of ``rabbitmq-alert`` to ``/var/log/rabbitmq-alert/``.
+| Log files are rotated in a daily basis.
 
 Contribute
 ==========
@@ -199,23 +201,8 @@ of the project.
 
 Happy coding :-)
 
-Build and publish a new container version
------------------------------------------
-
-To build a new image version of the project:
-
-::
-
-    docker build --no-cache -t mylkoh/rabbitmq-alert:1.2.2 -t mylkoh/rabbitmq-alert:latest .
-
-Publish the image:
-
-::
-
-    docker push mylkoh/rabbitmq-alert
-
-Testing the container
----------------------
+Playing with the container
+--------------------------
 
 Create a network that all containers will belong to:
 
@@ -228,10 +215,12 @@ Run ``rabbitmq`` into a container:
 
 ::
 
-    docker run -d --name some-rabbit --net rabbitmq-alert -p 8080:15672 rabbitmq:3-management
+    docker run -d --name some-rabbit --net rabbitmq-alert -p 15672:15672 rabbitmq:management
 
-| You can then go to http://localhost:8080 in a browser to use the management plugin.
-| The username and password are both ``guest``. Create a fake SMTP server:
+| You can then go to http://localhost:15672 in a browser to use the management plugin.
+| The username and password are both ``guest``.
+
+Create a fake SMTP server and check everything is okay with the email message functionality:
 
 ::
 
@@ -244,3 +233,7 @@ Now, run ``rabbitmq-alert`` using the same network:
     docker run -d --name rabbitmq-alert --net rabbitmq-alert \
     -v config.ini:/etc/rabbitmq-alert/config.ini mylkoh/rabbitmq-alert:latest
 
+Publishing
+----------
+
+For publishing the package and the container image, `view this wiki page <https://github.com/gfronza/rabbitmq-alert/wiki/Publishing>`_.
