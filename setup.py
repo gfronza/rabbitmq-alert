@@ -35,6 +35,9 @@ setup(
     description="Send notifications when predefined conditions are met",
     author="Germano Fronza (gfronza), Kostas Milonas (mylk), velika12, Robert Kopaczewski (23doors), Ivan Timeev (TeslA1402), Anderson Diego Kulpa Fachini (anderson-fachini), Dawid Deregowski (Venomen)",
     author_email="germano.inf@gmail.com",
+    install_requires=[
+        'requests'
+    ],
     url="https://github.com/gfronza/rabbitmq-alert",
     download_url="https://github.com/gfronza/rabbitmq-alert/tarball/" + VERSION,
     keywords=["rabbitmq", "alert", "monitor"],

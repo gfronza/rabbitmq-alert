@@ -3,3 +3,4 @@ twine==1.9.1
 docutils==0.14
 collective.checkdocs==0.2
 pylint==2.3.0
+requests
