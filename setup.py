@@ -38,7 +38,6 @@ setup(
     install_requires=[
         'requests'
     ],
-    python_requires='2.7',
     url="https://github.com/gfronza/rabbitmq-alert",
     download_url="https://github.com/gfronza/rabbitmq-alert/tarball/" + VERSION,
     keywords=["rabbitmq", "alert", "monitor"],
