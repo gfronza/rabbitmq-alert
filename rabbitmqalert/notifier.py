@@ -1,4 +1,7 @@
+import datetime
 import smtplib
+
+import requests
 import urllib2
 
 
@@ -24,7 +27,7 @@ class Notifier:
                     server.login(self.arguments["email_login"], self.arguments["email_password"])
                 else:
                     server.login(self.arguments["email_from"], self.arguments["email_password"])
-            
+
             email_from = self.arguments["email_from"]
             recipients = self.arguments["email_to"]
             # add subject as header before message text
@@ -47,9 +50,17 @@ class Notifier:
         if self.arguments["telegram_bot_id"] and self.arguments["telegram_channel"]:
             self.log.info("Sending Telegram notification: \"{0}\"".format(body))
 
-            text_telegram = "%s: %s" % (self.arguments["server_queue"], text)
-            telegram_url = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s" % (self.arguments["telegram_bot_id"], self.arguments["telegram_channel"], text_telegram)
+            text_telegram = "- <b>Time</b>: {0}\n" \
+                            "- <b>Server</b>: {1}\n" \
+                            "- <b>Queue</b>: {2}\n" \
+                            "- <b>Message</b>: {3}\n".format(datetime.datetime.now(), self.arguments["server_host_alias"], self.arguments["server_queue"], body)
+            data = {
+                'chat_id': self.arguments["telegram_channel"],
+                'text': text_telegram[0:4090],
+                'parse_mode': 'HTML'
+            }
+            telegram_url = "https://api.telegram.org/bot%s/sendMessage" % (self.arguments["telegram_bot_id"])
 
-            request = urllib2.Request(telegram_url)
-            response = urllib2.urlopen(request)
-            response.close()
+            request = requests.post(telegram_url, data=data, allow_redirects=True)
+            if request.status_code != 200:
+                self.log.info("Sending Telegram notification: \"{0}\"".format(request.text))
